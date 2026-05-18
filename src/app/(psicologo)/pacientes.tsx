@@ -5,6 +5,7 @@ import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
 import { Pagination } from "@/src/components/Pagination";
 import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 import { PatientActionsModal } from "@/src/components/PatientActionsModal";
+import { ConfirmRemoveModal } from "@/src/components/ConfirmRemoveModal";
 
 type Patient = {
   id: string;
@@ -51,6 +52,7 @@ export default function PacientesScreen() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [cadastroVisible, setCadastroVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const [actionsState, setActionsState] = useState<{
     patientId: string;
     position: ActionPosition;
@@ -138,9 +140,16 @@ export default function PacientesScreen() {
       <PatientActionsModal
         visible={actionsState !== null}
         patientId={actionsState?.patientId ?? null}
+        patientName={MOCK_PATIENTS.find((p) => p.id === actionsState?.patientId)?.name ?? null}
         position={actionsState?.position ?? null}
         onClose={() => setActionsState(null)}
-        onExcluir={() => {}}
+        onExcluir={() => setConfirmVisible(true)}
+      />
+
+      <ConfirmRemoveModal
+        visible={confirmVisible}
+        onClose={() => setConfirmVisible(false)}
+        onConfirm={() => setConfirmVisible(false)}
       />
     </View>
   );

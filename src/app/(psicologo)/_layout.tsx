@@ -3,11 +3,13 @@ import { View, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Sidebar } from "@/src/components/Sidebar";
+import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 
 const ICON_COLOR = "#2A6F68";
 
 export default function PsicologoLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [cadastroVisible, setCadastroVisible] = useState(false);
 
   return (
     <View style={{ flex: 1 }}>
@@ -67,6 +69,12 @@ export default function PsicologoLayout() {
       <Sidebar
         visible={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
+        onCadastrarPaciente={() => setCadastroVisible(true)}
+      />
+
+      <CadastrarPacienteModal
+        visible={cadastroVisible}
+        onClose={() => setCadastroVisible(false)}
       />
     </View>
   );

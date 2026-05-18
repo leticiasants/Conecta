@@ -16,31 +16,10 @@ const SIDEBAR_WIDTH = Dimensions.get("window").width * 0.78;
 interface Props {
   visible: boolean;
   onClose: () => void;
+  onCadastrarPaciente: () => void;
 }
 
-const NAV_ITEMS: {
-  icon: keyof typeof MaterialIcons.glyphMap;
-  label: string;
-  route: Href;
-}[] = [
-  {
-    icon: "home",
-    label: "Home",
-    route: "/(psicologo)",
-  },
-  {
-    icon: "person-add",
-    label: "Cadastrar Paciente",
-    route: "/(psicologo)/pacientes",
-  },
-  {
-    icon: "format-list-bulleted",
-    label: "Pacientes",
-    route: "/(psicologo)/pacientes",
-  },
-];
-
-export function Sidebar({ visible, onClose }: Props) {
+export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
   const insets = useSafeAreaInsets();
   const translateX = useRef(new Animated.Value(SIDEBAR_WIDTH)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
@@ -62,9 +41,33 @@ export function Sidebar({ visible, onClose }: Props) {
 
   function handleNavigate(route: Href) {
     onClose();
-
     router.push(route);
   }
+
+  const navItems: {
+    icon: keyof typeof MaterialIcons.glyphMap;
+    label: string;
+    onPress: () => void;
+  }[] = [
+    {
+      icon: "home",
+      label: "Home",
+      onPress: () => handleNavigate("/(psicologo)"),
+    },
+    {
+      icon: "format-list-bulleted",
+      label: "Pacientes",
+      onPress: () => handleNavigate("/(psicologo)/pacientes"),
+    },
+    {
+      icon: "person-add",
+      label: "Cadastrar Paciente",
+      onPress: () => {
+        onClose();
+        onCadastrarPaciente();
+      },
+    },
+  ];
 
   function handleLogout() {
     onClose();
@@ -114,10 +117,10 @@ export function Sidebar({ visible, onClose }: Props) {
         </View>
 
         <View style={{ flex: 1, paddingVertical: 8 }}>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <TouchableOpacity
               key={item.label}
-              onPress={() => handleNavigate(item.route)}
+              onPress={item.onPress}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -141,7 +144,7 @@ export function Sidebar({ visible, onClose }: Props) {
             alignItems: "center",
             gap: 14,
             paddingHorizontal: 20,
-            paddingBottom: insets.bottom + 24,
+            paddingBottom: insets.bottom,
             paddingTop: 16,
           }}
         >

@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { useState, type ReactNode } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Props {
   visible: boolean;
@@ -35,7 +34,7 @@ function formatDate(value: string): string {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <View className="mb-5">
-      <Text className="text-grey-800 text-sm font-bold mb-2">
+      <Text className="text-grey-800 text-sm mb-1">
         {label} <Text className="text-primary">*</Text>
       </Text>
       {children}
@@ -67,101 +66,115 @@ export function CadastrarPacienteModal({ visible, onClose }: Props) {
   }
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <View className="flex-1 bg-black/40 justify-center items-center px-5">
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
+          className="w-full justify-center"
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <ScrollView
-            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <TouchableOpacity
-              onPress={handleClose}
-              className="self-end pt-4 pb-2"
+          <View className="bg-white rounded-3xl min-w-full max-h-full">
+            <ScrollView
+              contentContainerStyle={{
+                paddingHorizontal: 24,
+                paddingBottom: 40,
+              }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              <MaterialIcons name="close" size={24} color="#3D3D3D" />
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleClose}
+                className="self-end pt-4 pb-2"
+              >
+                <MaterialIcons name="close" size={24} color="#3D3D3D" />
+              </TouchableOpacity>
 
-            <Text className="text-4xl font-bold text-primary text-center mb-8">
-              Cadastro
-            </Text>
+              <Text className="text-4xl font-bold text-primary text-center mb-8">
+                Cadastro
+              </Text>
 
-            <Field label="Nome">
-              <TextInput
-                className="bg-gray-100 rounded-xl px-4 py-4 text-base text-grey-800"
-                placeholder="João da Silva"
-                placeholderTextColor="#aaa"
-                value={name}
-                onChangeText={setName}
-              />
-            </Field>
-
-            <Field label="E-mail">
-              <TextInput
-                className="bg-gray-100 rounded-xl px-4 py-4 text-base text-grey-800"
-                placeholder="exemplo@mail.com"
-                placeholderTextColor="#aaa"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </Field>
-
-            <Field label="CPF">
-              <TextInput
-                className="bg-gray-100 rounded-xl px-4 py-4 text-base text-grey-800"
-                placeholder="XXX.XXX.XXX-XX"
-                placeholderTextColor="#aaa"
-                value={cpf}
-                onChangeText={(v) => setCpf(formatCPF(v))}
-                keyboardType="numeric"
-              />
-            </Field>
-
-            <Field label="Data de Nascimento">
-              <TextInput
-                className="bg-gray-100 rounded-xl px-4 py-4 text-base text-grey-800"
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#aaa"
-                value={birthDate}
-                onChangeText={(v) => setBirthDate(formatDate(v))}
-                keyboardType="numeric"
-              />
-            </Field>
-
-            <Field label="Senha">
-              <View className="bg-gray-100 rounded-xl flex-row items-center px-4">
+              <Field label="Nome">
                 <TextInput
-                  className="flex-1 py-4 text-base text-grey-800"
-                  placeholder="••••••••"
+                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                  placeholder="João da Silva"
                   placeholderTextColor="#aaa"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
+                  value={name}
+                  onChangeText={setName}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <MaterialIcons
-                    name={showPassword ? "visibility" : "visibility-off"}
-                    size={22}
-                    color="#aaa"
-                  />
-                </TouchableOpacity>
-              </View>
-            </Field>
+              </Field>
 
-            <TouchableOpacity
-              className="bg-primary rounded-xl py-4 items-center mt-2"
-              onPress={handleCadastrar}
-            >
-              <Text className="text-white font-bold text-base">Cadastrar</Text>
-            </TouchableOpacity>
-          </ScrollView>
+              <Field label="E-mail">
+                <TextInput
+                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                  placeholder="exemplo@mail.com"
+                  placeholderTextColor="#aaa"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </Field>
+
+              <Field label="CPF">
+                <TextInput
+                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                  placeholder="XXX.XXX.XXX-XX"
+                  placeholderTextColor="#aaa"
+                  value={cpf}
+                  onChangeText={(v) => setCpf(formatCPF(v))}
+                  keyboardType="numeric"
+                />
+              </Field>
+
+              <Field label="Data de Nascimento">
+                <TextInput
+                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                  placeholder="DD/MM/AAAA"
+                  placeholderTextColor="#aaa"
+                  value={birthDate}
+                  onChangeText={(v) => setBirthDate(formatDate(v))}
+                  keyboardType="numeric"
+                />
+              </Field>
+
+              <Field label="Senha">
+                <View className="bg-gray-100 rounded-xl flex-row items-center px-4">
+                  <TextInput
+                    className="flex-1 py-4 text-sm text-grey-800"
+                    placeholder="••••••••"
+                    placeholderTextColor="#aaa"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <MaterialIcons
+                      name={showPassword ? "visibility" : "visibility-off"}
+                      size={22}
+                      color="#aaa"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </Field>
+
+              <TouchableOpacity
+                className="bg-primary rounded-xl py-4 items-center mt-2"
+                onPress={handleCadastrar}
+              >
+                <Text className="text-white font-bold text-base">
+                  Cadastrar
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

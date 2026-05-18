@@ -9,6 +9,7 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 interface Props {
   visible: boolean;
   patientId: string | null;
+  patientName: string | null;
   position: ActionPosition | null;
   onClose: () => void;
   onExcluir: () => void;
@@ -17,6 +18,7 @@ interface Props {
 export function PatientActionsModal({
   visible,
   patientId,
+  patientName,
   position,
   onClose,
   onExcluir,
@@ -34,7 +36,7 @@ export function PatientActionsModal({
     onClose();
     router.push({
       pathname: "/(psicologo)/registros/[id]",
-      params: { id: patientId ?? "" },
+      params: { id: patientId ?? "", name: patientName ?? "" },
     });
   }
 
