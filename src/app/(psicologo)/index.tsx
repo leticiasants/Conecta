@@ -12,13 +12,13 @@ export default function HomeScreen() {
           os relatos para acompanhar melhor seus sentimentos, identificar
           padrões e preparar sessões mais eficazes e acolhedoras.
         </Text>
-        <Text className="text-grey-500 text-center">
+        <Text className="text-grey-500 text-center font-secondary-bold">
           “Entender o que o paciente vive no dia a dia é o primeiro passo para
           ajudá-lo com empatia”
         </Text>
       </View>
       <Image
-        source={require("../../assets/terapia.png")}
+        source={require("@/src/assets/terapia.png")}
         className="w-92"
         resizeMode="contain"
       />

@@ -2,6 +2,8 @@ import { Tabs } from "expo-router";
 import { View, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+const ICON_COLOR = "#2A6F68";
+
 export default function PsicologoLayout() {
   return (
     <Tabs
@@ -17,7 +19,7 @@ export default function PsicologoLayout() {
         headerTitle: () => (
           <View className="flex-row items-center gap-2">
             <Image
-              source={require("../../assets/logo/logo_img_conecta.png")}
+              source={require("@/src/assets/logo/logo_img_conecta.png")}
               style={{
                 width: 35,
                 height: 35,
@@ -26,7 +28,7 @@ export default function PsicologoLayout() {
             />
 
             <Image
-              source={require("../../assets/logo/logo_nome_conecta.png")}
+              source={require("@/src/assets/logo/logo_nome_conecta.png")}
               style={{
                 width: 85,
                 height: 30,
@@ -46,14 +48,12 @@ export default function PsicologoLayout() {
 
         headerRight: () => (
           <TouchableOpacity
-            onPress={() => {
-              console.log("Abrir menu");
-            }}
+            onPress={() => {}}
             style={{
               marginRight: 15,
             }}
           >
-            <MaterialIcons name="menu" size={28} color="#2A6F68" />
+            <MaterialIcons name="menu" size={28} color={ICON_COLOR} />
           </TouchableOpacity>
         ),
       }}

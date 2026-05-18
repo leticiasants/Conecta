@@ -13,16 +13,16 @@ export default function LoginScreen() {
   }
 
   return (
-    <View className="flex-1 font-primary-medium justify-end bg-white">
+    <View className="flex-1 justify-end bg-white">
       <View className="justify-center px-6 gap-2 items-center py-20">
         <View className="flex-row items-center gap-1">
           <Image
-            source={require("../assets/logo/logo_img_conecta.png")}
+            source={require("@/src/assets/logo/logo_img_conecta.png")}
             className="w-12 h-12"
             resizeMode="contain"
           />
           <Image
-            source={require("../assets/logo/logo_nome_conecta.png")}
+            source={require("@/src/assets/logo/logo_nome_conecta.png")}
             className="h-12 w-32"
             resizeMode="contain"
           />
