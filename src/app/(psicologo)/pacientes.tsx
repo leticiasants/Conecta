@@ -4,9 +4,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
 import { Pagination } from "@/src/components/Pagination";
 import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
-import { PatientActionsModal } from "@/src/components/PatientActionsModal";
+import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { SearchBar } from "@/src/components/SearchBar";
+import { router } from "expo-router";
 
 type Patient = {
   id: string;
@@ -140,16 +141,32 @@ export default function PacientesScreen() {
         onClose={() => setCadastroVisible(false)}
       />
 
-      <PatientActionsModal
+      <ActionsDropdownModal
         visible={actionsState !== null}
-        patientId={actionsState?.patientId ?? null}
-        patientName={
-          MOCK_PATIENTS.find((p) => p.id === actionsState?.patientId)?.name ??
-          null
-        }
         position={actionsState?.position ?? null}
         onClose={() => setActionsState(null)}
-        onExcluir={() => setConfirmVisible(true)}
+        items={[
+          {
+            icon: "article",
+            label: "Registros",
+            onPress: () => {
+              const patient = MOCK_PATIENTS.find(
+                (p) => p.id === actionsState?.patientId
+              );
+              router.push({
+                pathname: "/(psicologo)/registros/[id]",
+                params: { id: patient?.id ?? "", name: patient?.name ?? "" },
+              });
+            },
+          },
+          {
+            icon: "delete",
+            label: "Excluir",
+            iconColor: "#990000",
+            labelClass: "text-sm font-semibold text-red",
+            onPress: () => setConfirmVisible(true),
+          },
+        ]}
       />
 
       <ConfirmModal

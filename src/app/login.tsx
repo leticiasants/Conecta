@@ -1,7 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { useState } from "react";
-import { Link, router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -9,7 +9,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   function handleLogin() {
-    router.replace("/(psicologo)");
+    router.replace("/(paciente)");
   }
 
   return (

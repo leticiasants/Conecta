@@ -1,18 +1,18 @@
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { useFonts } from "expo-font";
+import {
+  LifeSavers_400Regular,
+  LifeSavers_700Bold,
+  LifeSavers_800ExtraBold,
+} from "@expo-google-fonts/life-savers";
 import {
   Poppins_400Regular,
   Poppins_500Medium,
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
-import {
-  LifeSavers_400Regular,
-  LifeSavers_700Bold,
-  LifeSavers_800ExtraBold,
-} from "@expo-google-fonts/life-savers";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import "../styles/globals.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -42,6 +42,7 @@ export default function RootLayout() {
       <Stack.Screen name="login" />
       <Stack.Screen name="cadastro" />
       <Stack.Screen name="(psicologo)" />
+      <Stack.Screen name="(paciente)" />
     </Stack>
   );
 }

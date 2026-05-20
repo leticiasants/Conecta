@@ -1,13 +1,9 @@
 import { useRef } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import type { ActionPosition } from "@/src/types";
 
-export type ActionPosition = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+export type { ActionPosition };
 
 interface Props {
   name: string;

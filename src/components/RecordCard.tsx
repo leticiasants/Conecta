@@ -1,6 +1,7 @@
+import { useRef, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import type { ActionPosition } from "@/src/types";
 
 interface Props {
   title: string;
@@ -8,10 +9,25 @@ interface Props {
   intensity: number;
   description: string;
   date: string;
+  onActions?: (position: ActionPosition) => void;
 }
 
-export function RecordCard({ title, emotion, intensity, description, date }: Props) {
+export function RecordCard({
+  title,
+  emotion,
+  intensity,
+  description,
+  date,
+  onActions,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
+  const buttonRef = useRef<View>(null);
+
+  function handleActions() {
+    buttonRef.current?.measureInWindow((x, y, width, height) => {
+      onActions?.({ x, y, width, height });
+    });
+  }
 
   return (
     <View
@@ -26,7 +42,19 @@ export function RecordCard({ title, emotion, intensity, description, date }: Pro
       }}
     >
       <View className="px-4 pt-4 pb-3">
-        <Text className="font-bold text-base text-primary mb-3">{title}</Text>
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="font-bold text-base text-primary flex-1">{title}</Text>
+          {onActions && (
+            <TouchableOpacity
+              onPress={handleActions}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <View ref={buttonRef}>
+                <MaterialIcons name="more-vert" size={20} color="#828282" />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
 
         <View className="flex-row gap-2 mb-3 flex-wrap">
           <View className="px-3 py-1 rounded-full bg-secondary/20">
@@ -35,9 +63,7 @@ export function RecordCard({ title, emotion, intensity, description, date }: Pro
             </Text>
           </View>
           <View className="px-3 py-1 rounded-full bg-secondary/20">
-            <Text className="text-xs text-primary">
-              Intensidade: {intensity}
-            </Text>
+            <Text className="text-xs text-primary">Intensidade: {intensity}</Text>
           </View>
         </View>
 
