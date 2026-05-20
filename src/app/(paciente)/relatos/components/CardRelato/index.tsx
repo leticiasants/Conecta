@@ -9,7 +9,7 @@ interface Props {
   intensidade: number;
   descricao: string;
   dataOcorrido: string;
-  onActions?: (position: ActionPosition) => void;
+  acoes?: (position: ActionPosition) => void;
 }
 
 export function CardRelato({
@@ -18,14 +18,14 @@ export function CardRelato({
   intensidade,
   descricao,
   dataOcorrido,
-  onActions,
+  acoes,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const buttonRef = useRef<View>(null);
 
   function handleActions() {
     buttonRef.current?.measureInWindow((x, y, width, height) => {
-      onActions?.({ x, y, width, height });
+      acoes?.({ x, y, width, height });
     });
   }
 
@@ -46,7 +46,7 @@ export function CardRelato({
           <Text className="font-bold text-base text-primary flex-1">
             {titulo}
           </Text>
-          {onActions && (
+          {acoes && (
             <TouchableOpacity
               onPress={handleActions}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
