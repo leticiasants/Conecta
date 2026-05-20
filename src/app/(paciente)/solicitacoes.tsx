@@ -1,8 +1,9 @@
-import { View, Text, FlatList } from "react-native";
-import { useState } from "react";
-import { SolicitacaoCard } from "@/src/components/SolicitacaoCard";
-import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { AceitarVinculoModal } from "@/src/components/AceitarVinculoModal";
+import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { SolicitacaoCard } from "@/src/components/SolicitacaoCard";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { FlatList, Text, View } from "react-native";
 
 type Solicitacao = {
   id: string;
@@ -80,7 +81,13 @@ export default function SolicitacoesScreen() {
           />
         )}
         ListEmptyComponent={
-          <View className="items-center justify-center py-16">
+          <View className="items-center justify-center py-32 gap-2">
+            <MaterialIcons
+              name="search-off"
+              size={40}
+              color="#828282"
+              className="mt-0.5 ml-1"
+            />
             <Text className="text-grey-500 text-sm">
               Nenhuma solicitação pendente.
             </Text>

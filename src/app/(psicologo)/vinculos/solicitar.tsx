@@ -1,8 +1,9 @@
-import { View, Text, FlatList } from "react-native";
-import { useState } from "react";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
 import { VinculoCard } from "@/src/components/VinculoCard";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { FlatList, Text, View } from "react-native";
 
 type Paciente = {
   id: string;
@@ -49,13 +50,13 @@ export default function SolicitarVinculoScreen() {
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.phone.includes(search)
+      p.phone.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const pageData = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   function handleSearch(text: string) {
@@ -108,7 +109,13 @@ export default function SolicitarVinculoScreen() {
           );
         }}
         ListEmptyComponent={
-          <View className="items-center justify-center py-16">
+          <View className="items-center justify-center py-32 gap-2">
+            <MaterialIcons
+              name="search-off"
+              size={40}
+              color="#828282"
+              className="mt-0.5 ml-1"
+            />
             <Text className="text-grey-500 text-sm">
               Nenhum paciente encontrado.
             </Text>

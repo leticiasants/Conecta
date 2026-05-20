@@ -4,6 +4,7 @@ import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
 import { VinculoCard } from "@/src/components/VinculoCard";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Vinculo = {
   id: string;
@@ -51,13 +52,13 @@ export default function VinculosPendentesScreen() {
     (v) =>
       v.name.toLowerCase().includes(search.toLowerCase()) ||
       v.email.toLowerCase().includes(search.toLowerCase()) ||
-      v.phone.includes(search)
+      v.phone.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const pageData = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   function handleSearch(text: string) {
@@ -106,7 +107,13 @@ export default function VinculosPendentesScreen() {
           />
         )}
         ListEmptyComponent={
-          <View className="items-center justify-center py-16">
+          <View className="items-center justify-center py-32 gap-2">
+            <MaterialIcons
+              name="search-off"
+              size={40}
+              color="#828282"
+              className="mt-0.5 ml-1"
+            />
             <Text className="text-grey-500 text-sm">
               Nenhuma solicitação pendente.
             </Text>

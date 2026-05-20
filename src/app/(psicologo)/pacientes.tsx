@@ -1,13 +1,13 @@
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
-import { Pagination } from "@/src/components/Pagination";
-import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
+import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { Pagination } from "@/src/components/Pagination";
+import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
 import { SearchBar } from "@/src/components/SearchBar";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 type Patient = {
   id: string;
@@ -64,13 +64,13 @@ export default function PacientesScreen() {
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.phone.includes(search)
+      p.phone.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const pageData = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   function handleSearch(text: string) {
@@ -122,7 +122,13 @@ export default function PacientesScreen() {
           />
         )}
         ListEmptyComponent={
-          <View className="items-center justify-center py-16">
+          <View className="items-center justify-center py-32 gap-2">
+            <MaterialIcons
+              name="search-off"
+              size={40}
+              color="#828282"
+              className="mt-0.5 ml-1"
+            />
             <Text className="text-grey-500 text-sm">
               Nenhum paciente encontrado.
             </Text>
@@ -151,7 +157,7 @@ export default function PacientesScreen() {
             label: "Registros",
             onPress: () => {
               const patient = MOCK_PATIENTS.find(
-                (p) => p.id === actionsState?.patientId
+                (p) => p.id === actionsState?.patientId,
               );
               router.push({
                 pathname: "/(psicologo)/registros/[id]",

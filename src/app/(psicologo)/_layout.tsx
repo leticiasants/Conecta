@@ -21,9 +21,29 @@ export default function PsicologoLayout() {
           },
 
           headerShadowVisible: false,
-          headerTitleAlign: "left",
 
-          headerTitle: () => (
+          headerTitle: () => null,
+
+          headerLeftContainerStyle: {
+            paddingLeft: 5,
+          },
+
+          headerRightContainerStyle: {
+            paddingRight: 5,
+          },
+
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => setSidebarVisible(true)}
+              style={{
+                marginLeft: 15,
+              }}
+            >
+              <MaterialIcons name="menu" size={28} color={ICON_COLOR} />
+            </TouchableOpacity>
+          ),
+
+          headerRight: () => (
             <View className="flex-row items-center gap-2">
               <Image
                 source={require("@/src/assets/logo/logo_img_conecta.png")}
@@ -44,32 +64,34 @@ export default function PsicologoLayout() {
               />
             </View>
           ),
-
-          headerLeftContainerStyle: {
-            paddingLeft: 5,
-          },
-
-          headerRightContainerStyle: {
-            paddingRight: 5,
-          },
-
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => setSidebarVisible(true)}
-              style={{
-                marginRight: 15,
-              }}
-            >
-              <MaterialIcons name="menu" size={28} color={ICON_COLOR} />
-            </TouchableOpacity>
-          ),
         }}
       />
 
       <Sidebar
         visible={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
-        onCadastrarPaciente={() => setCadastroVisible(true)}
+        items={[
+          { icon: "home", label: "Home", route: "/(psicologo)" },
+          {
+            icon: "people",
+            label: "Pacientes",
+            route: "/(psicologo)/pacientes",
+            subItems: [
+              { label: "Meus Pacientes", route: "/(psicologo)/pacientes" },
+              { label: "Cadastrar Pacientes", onPress: () => { setSidebarVisible(false); setCadastroVisible(true); } },
+            ],
+          },
+          {
+            icon: "person-add",
+            label: "Vínculos",
+            route: "/(psicologo)/vinculos/solicitar",
+            subItems: [
+              { label: "Solicitar Vínculo", route: "/(psicologo)/vinculos/solicitar" },
+              { label: "Vínculos Pendentes", route: "/(psicologo)/vinculos/pendentes" },
+            ],
+          },
+          { icon: "person", label: "Meus Dados", route: "/(psicologo)/meus-dados" },
+        ]}
       />
 
       <CadastrarPacienteModal

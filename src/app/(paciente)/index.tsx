@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { Image, Text, View } from "react-native";
 
 export default function HomePacienteScreen() {
   return (
@@ -8,12 +8,14 @@ export default function HomePacienteScreen() {
           Bem-vindo(a), Maria Silva!
         </Text>
         <Text className="text-center text-grey-800 font-primary">
-          Aqui você pode registrar suas emoções e acompanhar sua jornada de
-          autoconhecimento. Use os relatos para expressar o que sente e
-          compartilhar com seu profissional de confiança.
+          Registrar o que você sente ao longo da semana é um passo importante
+          para o seu autoconhecimento. Compartilhar seus relatos com o(a)
+          psicólogo(a) também ajuda na construção de um processo terapêutico
+          mais eficaz.
         </Text>
         <Text className="text-grey-500 text-center font-secondary-bold">
-          "Nomear o que sentimos é o primeiro passo para compreender quem somos"
+          “Escrever é uma forma de organizar sentimentos e perceber padrões com
+          mais clareza.”
         </Text>
       </View>
       <Image

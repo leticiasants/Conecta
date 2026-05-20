@@ -1,10 +1,11 @@
-import { View, Text, FlatList } from "react-native";
-import { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
-import { RecordCard } from "@/src/components/RecordCard";
+
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { FlatList, Text, View } from "react-native";
+import { CardRelato } from "../../(paciente)/relatos/components";
 
 type Record = {
   id: string;
@@ -67,13 +68,13 @@ export default function RegistrosScreen() {
     (r) =>
       r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.emotion.toLowerCase().includes(search.toLowerCase()) ||
-      String(r.intensity).includes(search)
+      String(r.intensity).includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const pageData = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   function handleSearch(text: string) {
@@ -110,16 +111,22 @@ export default function RegistrosScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <RecordCard
-            title={item.title}
-            emotion={item.emotion}
-            intensity={item.intensity}
-            description={item.description}
-            date={item.date}
+          <CardRelato
+            titulo={item.title}
+            emocao={item.emotion}
+            intensidade={item.intensity}
+            descricao={item.description}
+            dataOcorrido={item.date}
           />
         )}
         ListEmptyComponent={
-          <View className="items-center justify-center py-16">
+          <View className="items-center justify-center py-32 gap-2">
+            <MaterialIcons
+              name="search-off"
+              size={40}
+              color="#828282"
+              className="mt-0.5 ml-1"
+            />
             <Text className="text-grey-500 text-sm">
               Nenhum registro encontrado.
             </Text>

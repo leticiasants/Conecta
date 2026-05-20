@@ -1,5 +1,5 @@
-import { View, TextInput, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { TextInput, TouchableOpacity, View } from "react-native";
 
 interface Props {
   value: string;
@@ -21,7 +21,7 @@ export function SearchBar({ value, onChangeText, placeholder }: Props) {
         />
       </View>
       <TouchableOpacity>
-        <MaterialIcons name="tune" size={24} color="#828282" />
+        <MaterialIcons name="tune" size={24} color="#5C868E" />
       </TouchableOpacity>
     </View>
   );

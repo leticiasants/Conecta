@@ -1,23 +1,23 @@
-import { useRef, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import type { ActionPosition } from "@/src/types";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
-  title: string;
-  emotion: string;
-  intensity: number;
-  description: string;
-  date: string;
+  titulo: string;
+  emocao: string;
+  intensidade: number;
+  descricao: string;
+  dataOcorrido: string;
   onActions?: (position: ActionPosition) => void;
 }
 
-export function RecordCard({
-  title,
-  emotion,
-  intensity,
-  description,
-  date,
+export function CardRelato({
+  titulo,
+  emocao,
+  intensidade,
+  descricao,
+  dataOcorrido,
   onActions,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
@@ -43,7 +43,9 @@ export function RecordCard({
     >
       <View className="px-4 pt-4 pb-3">
         <View className="flex-row items-center justify-between mb-3">
-          <Text className="font-bold text-base text-primary flex-1">{title}</Text>
+          <Text className="font-bold text-base text-primary flex-1">
+            {titulo}
+          </Text>
           {onActions && (
             <TouchableOpacity
               onPress={handleActions}
@@ -59,11 +61,13 @@ export function RecordCard({
         <View className="flex-row gap-2 mb-3 flex-wrap">
           <View className="px-3 py-1 rounded-full bg-secondary/20">
             <Text className="text-xs text-primary">
-              Emoção Principal: {emotion}
+              Emoção Principal: {emocao}
             </Text>
           </View>
           <View className="px-3 py-1 rounded-full bg-secondary/20">
-            <Text className="text-xs text-primary">Intensidade: {intensity}</Text>
+            <Text className="text-xs text-primary">
+              Intensidade: {intensidade}
+            </Text>
           </View>
         </View>
 
@@ -79,7 +83,7 @@ export function RecordCard({
               className="text-sm text-grey-800 leading-5"
               numberOfLines={expanded ? undefined : 3}
             >
-              {description}
+              {descricao}
             </Text>
             <TouchableOpacity
               onPress={() => setExpanded(!expanded)}
@@ -97,7 +101,9 @@ export function RecordCard({
           </View>
         </View>
 
-        <Text className="text-xs text-grey-500 mt-3">Ocorrido em {date}</Text>
+        <Text className="text-xs text-grey-500 mt-3">
+          Ocorrido em {dataOcorrido}
+        </Text>
       </View>
     </View>
   );
