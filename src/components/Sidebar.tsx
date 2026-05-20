@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useEffect, useRef } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { router, type Href } from "expo-router";
+import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SIDEBAR_WIDTH = Dimensions.get("window").width * 0.78;
@@ -17,6 +17,50 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onCadastrarPaciente: () => void;
+}
+
+function NavItem({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: keyof typeof MaterialIcons.glyphMap;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 14,
+        paddingVertical: 14,
+        paddingHorizontal: 20,
+      }}
+    >
+      <MaterialIcons name={icon} size={22} color="#1a1a1a" />
+      <Text style={{ fontSize: 16, color: "#1a1a1a" }}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function SubItem({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        paddingVertical: 10,
+        paddingLeft: 36,
+        paddingRight: 20,
+        borderLeftWidth: 2,
+        borderLeftColor: "#D0D0D0",
+        marginLeft: 20,
+      }}
+    >
+      <Text style={{ fontSize: 15, color: "#1a1a1a" }}>{label}</Text>
+    </TouchableOpacity>
+  );
 }
 
 export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
@@ -39,35 +83,10 @@ export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
     ]).start();
   }, [visible]);
 
-  function handleNavigate(route: Href) {
+  function nav(route: string) {
     onClose();
-    router.push(route);
+    router.push(route as any);
   }
-
-  const navItems: {
-    icon: keyof typeof MaterialIcons.glyphMap;
-    label: string;
-    onPress: () => void;
-  }[] = [
-    {
-      icon: "home",
-      label: "Home",
-      onPress: () => handleNavigate("/(psicologo)"),
-    },
-    {
-      icon: "format-list-bulleted",
-      label: "Pacientes",
-      onPress: () => handleNavigate("/(psicologo)/pacientes"),
-    },
-    {
-      icon: "person-add",
-      label: "Cadastrar Paciente",
-      onPress: () => {
-        onClose();
-        onCadastrarPaciente();
-      },
-    },
-  ];
 
   function handleLogout() {
     onClose();
@@ -93,19 +112,19 @@ export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
       </Pressable>
 
       <Animated.View
+        className="bg-white"
         style={{
           position: "absolute",
           top: 0,
           right: 0,
           bottom: 0,
           width: SIDEBAR_WIDTH,
-          backgroundColor: "white",
           transform: [{ translateX }],
         }}
       >
         <View
+          className="bg-primary"
           style={{
-            backgroundColor: "#2A6F68",
             paddingTop: insets.top + 16,
             paddingBottom: 20,
             paddingHorizontal: 16,
@@ -117,24 +136,48 @@ export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
         </View>
 
         <View style={{ flex: 1, paddingVertical: 8 }}>
-          {navItems.map((item) => (
-            <TouchableOpacity
-              key={item.label}
-              onPress={item.onPress}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 14,
-                paddingVertical: 16,
-                paddingHorizontal: 20,
-              }}
-            >
-              <MaterialIcons name={item.icon} size={22} color="#1a1a1a" />
-              <Text style={{ fontSize: 16, color: "#1a1a1a" }}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          <NavItem
+            icon="home"
+            label="Home"
+            onPress={() => nav("/(psicologo)")}
+          />
+
+          <NavItem
+            icon="people"
+            label="Pacientes"
+            onPress={() => nav("/(psicologo)/pacientes")}
+          />
+          <SubItem
+            label="Meus Pacientes"
+            onPress={() => nav("/(psicologo)/pacientes")}
+          />
+          <SubItem
+            label="Cadastrar Pacientes"
+            onPress={() => {
+              onClose();
+              onCadastrarPaciente();
+            }}
+          />
+
+          <NavItem
+            icon="person-add"
+            label="Vínculos"
+            onPress={() => nav("/(psicologo)/vinculos/solicitar")}
+          />
+          <SubItem
+            label="Solicitar Vínculo"
+            onPress={() => nav("/(psicologo)/vinculos/solicitar")}
+          />
+          <SubItem
+            label="Vínculos Pendentes"
+            onPress={() => nav("/(psicologo)/vinculos/pendentes")}
+          />
+
+          <NavItem
+            icon="person"
+            label="Meus Dados"
+            onPress={() => nav("/(psicologo)/meus-dados")}
+          />
         </View>
 
         <TouchableOpacity
@@ -144,14 +187,14 @@ export function Sidebar({ visible, onClose, onCadastrarPaciente }: Props) {
             alignItems: "center",
             gap: 14,
             paddingHorizontal: 20,
-            paddingBottom: insets.bottom,
+            paddingBottom: insets.bottom + 16,
             paddingTop: 16,
+            borderTopWidth: 1,
+            borderTopColor: "#F0F0F0",
           }}
         >
-          <MaterialIcons name="logout" size={22} color="#8B0000" />
-          <Text style={{ color: "#8B0000", fontWeight: "600", fontSize: 16 }}>
-            Sair
-          </Text>
+          <MaterialIcons name="logout" size={22} color="#990000" />
+          <Text className="text-red font-semibold text-base">Sair</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>

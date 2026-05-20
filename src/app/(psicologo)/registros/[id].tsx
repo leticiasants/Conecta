@@ -1,9 +1,10 @@
-import { View, Text, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { RecordCard } from "@/src/components/RecordCard";
 import { Pagination } from "@/src/components/Pagination";
+import { SearchBar } from "@/src/components/SearchBar";
 
 type Record = {
   id: string;
@@ -26,7 +27,7 @@ const MOCK_RECORDS: Record[] = [
   },
   {
     id: "2",
-    title: "Dia Feliz",
+    title: "Dia feliz",
     emotion: "Alegria",
     intensity: 8,
     description:
@@ -53,7 +54,7 @@ const MOCK_RECORDS: Record[] = [
   },
 ];
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 3;
 
 export default function RegistrosScreen() {
   const { name } = useLocalSearchParams<{ id: string; name: string }>();
@@ -62,8 +63,11 @@ export default function RegistrosScreen() {
 
   const patientName = Array.isArray(name) ? name[0] : (name ?? "");
 
-  const filtered = MOCK_RECORDS.filter((r) =>
-    r.title.toLowerCase().includes(search.toLowerCase())
+  const filtered = MOCK_RECORDS.filter(
+    (r) =>
+      r.title.toLowerCase().includes(search.toLowerCase()) ||
+      r.emotion.toLowerCase().includes(search.toLowerCase()) ||
+      String(r.intensity).includes(search)
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -81,27 +85,23 @@ export default function RegistrosScreen() {
     <View className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <Text className="text-2xl font-bold text-primary mb-1">Registros</Text>
-        <Text className="text-sm text-grey-800 mb-4">
-          <Text className="font-bold">Paciente: </Text>
-          {patientName}
+        <Text className="text-sm text-grey-500 mb-3">
+          Acompanhe os registros emocionais dos pacientes.
         </Text>
 
-        <View className="flex-row items-center gap-2">
-          <View className="flex-1 flex-row items-center bg-gray-100 rounded-full px-3 h-10">
-            <MaterialIcons name="search" size={18} color="#828282" />
-            <TextInput
-              className="flex-1 ml-2 text-sm text-grey-800"
-              placeholder="Buscar"
-              placeholderTextColor="#aaa"
-              value={search}
-              onChangeText={handleSearch}
-            />
-          </View>
-
-          <TouchableOpacity>
-            <MaterialIcons name="tune" size={24} color="#828282" />
-          </TouchableOpacity>
+        <View className="flex-row items-center gap-1 mb-4">
+          <MaterialIcons name="person" size={16} color="#5C868E" />
+          <Text className="text-sm">
+            <Text className="font-bold text-grey-800">Paciente: </Text>
+            <Text className="text-primary">{patientName}</Text>
+          </Text>
         </View>
+
+        <SearchBar
+          value={search}
+          onChangeText={handleSearch}
+          placeholder="Buscar por situação, emoção ou intensidade"
+        />
       </View>
 
       <FlatList

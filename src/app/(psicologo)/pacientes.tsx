@@ -1,11 +1,12 @@
-import { View, Text, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
 import { Pagination } from "@/src/components/Pagination";
 import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 import { PatientActionsModal } from "@/src/components/PatientActionsModal";
-import { ConfirmRemoveModal } from "@/src/components/ConfirmRemoveModal";
+import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { SearchBar } from "@/src/components/SearchBar";
 
 type Patient = {
   id: string;
@@ -58,8 +59,11 @@ export default function PacientesScreen() {
     position: ActionPosition;
   } | null>(null);
 
-  const filtered = MOCK_PATIENTS.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = MOCK_PATIENTS.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.email.toLowerCase().includes(search.toLowerCase()) ||
+      p.phone.includes(search)
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -76,31 +80,28 @@ export default function PacientesScreen() {
   return (
     <View className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
-        <Text className="text-2xl font-bold text-primary mb-4">Pacientes</Text>
-
-        <View className="flex-row items-center gap-2">
+        <View className="flex-row items-start justify-between mb-4">
+          <View>
+            <Text className="text-2xl font-bold text-primary">
+              Meus Pacientes
+            </Text>
+            <Text className="text-sm text-grey-500 mt-0.5">
+              Acompanhe seus pacientes.
+            </Text>
+          </View>
           <TouchableOpacity
-            className="w-10 h-10 rounded-full bg-primary items-center justify-center"
+            className="w-11 h-11 rounded-full bg-primary items-center justify-center"
             onPress={() => setCadastroVisible(true)}
           >
-            <MaterialIcons name="add" size={24} color="white" />
-          </TouchableOpacity>
-
-          <View className="flex-1 flex-row items-center bg-gray-100 rounded-full px-3 h-10">
-            <MaterialIcons name="search" size={18} color="#828282" />
-            <TextInput
-              className="flex-1 ml-2 text-sm text-grey-800"
-              placeholder="Buscar"
-              placeholderTextColor="#aaa"
-              value={search}
-              onChangeText={handleSearch}
-            />
-          </View>
-
-          <TouchableOpacity>
-            <MaterialIcons name="tune" size={24} color="#828282" />
+            <MaterialIcons name="person-add" size={22} color="white" />
           </TouchableOpacity>
         </View>
+
+        <SearchBar
+          value={search}
+          onChangeText={handleSearch}
+          placeholder="Buscar por nome, e-mail ou contato"
+        />
       </View>
 
       <FlatList
@@ -114,7 +115,9 @@ export default function PacientesScreen() {
             email={item.email}
             phone={item.phone}
             birthDate={item.birthDate}
-            onActions={(pos) => setActionsState({ patientId: item.id, position: pos })}
+            onActions={(pos) =>
+              setActionsState({ patientId: item.id, position: pos })
+            }
           />
         )}
         ListEmptyComponent={
@@ -140,16 +143,20 @@ export default function PacientesScreen() {
       <PatientActionsModal
         visible={actionsState !== null}
         patientId={actionsState?.patientId ?? null}
-        patientName={MOCK_PATIENTS.find((p) => p.id === actionsState?.patientId)?.name ?? null}
+        patientName={
+          MOCK_PATIENTS.find((p) => p.id === actionsState?.patientId)?.name ??
+          null
+        }
         position={actionsState?.position ?? null}
         onClose={() => setActionsState(null)}
         onExcluir={() => setConfirmVisible(true)}
       />
 
-      <ConfirmRemoveModal
+      <ConfirmModal
         visible={confirmVisible}
+        message="Tem certeza de que deseja remover esse paciente?"
         onClose={() => setConfirmVisible(false)}
-        onConfirm={() => setConfirmVisible(false)}
+        onConfirm={() => {}}
       />
     </View>
   );
