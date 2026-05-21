@@ -1,50 +1,48 @@
 import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
-import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
-import { PatientCard, type ActionPosition } from "@/src/components/PatientCard";
 import { SearchBar } from "@/src/components/SearchBar";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { ActionPosition, CardPaciente } from "./components";
+import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
+import { ModalCadastrarPaciente } from "@/src/modules/psicologo/components";
 
-type Patient = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  birthDate: string;
-};
+interface Paciente extends Pick<
+  IDadosPaciente,
+  "id" | "nome" | "email" | "contato" | "nascimento"
+> {}
 
-const MOCK_PATIENTS: Patient[] = [
+const MOCK_PATIENTS: Paciente[] = [
   {
     id: "1",
-    name: "Ana Clara Mendes",
+    nome: "Ana Clara Mendes",
     email: "ana@gmail.com",
-    phone: "(35) 99999-9999",
-    birthDate: "02/02/2002",
+    contato: "(35) 99999-9999",
+    nascimento: "02/02/2002",
   },
   {
     id: "2",
-    name: "Carlos Eduardo Santos",
+    nome: "Carlos Eduardo Santos",
     email: "carlos@gmail.com",
-    phone: "(11) 98888-8888",
-    birthDate: "15/06/1990",
+    contato: "(11) 98888-8888",
+    nascimento: "15/06/1990",
   },
   {
     id: "3",
-    name: "Mariana Costa Lima",
+    nome: "Mariana Costa Lima",
     email: "mariana@gmail.com",
-    phone: "(21) 97777-7777",
-    birthDate: "23/11/1995",
+    contato: "(21) 97777-7777",
+    nascimento: "23/11/1995",
   },
   {
     id: "4",
-    name: "Pedro Henrique Alves",
+    nome: "Pedro Henrique Alves",
     email: "pedro@gmail.com",
-    phone: "(31) 96666-6666",
-    birthDate: "08/03/1988",
+    contato: "(31) 96666-6666",
+    nascimento: "08/03/1988",
   },
 ];
 
@@ -62,9 +60,9 @@ export default function PacientesScreen() {
 
   const filtered = MOCK_PATIENTS.filter(
     (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.nome.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.phone.includes(search),
+      p.contato?.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -111,11 +109,11 @@ export default function PacientesScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <PatientCard
-            name={item.name}
+          <CardPaciente
+            nome={item.nome}
             email={item.email}
-            phone={item.phone}
-            birthDate={item.birthDate}
+            contato={item.contato}
+            nascimento={item.nascimento}
             onActions={(pos) =>
               setActionsState({ patientId: item.id, position: pos })
             }
@@ -142,7 +140,7 @@ export default function PacientesScreen() {
         onPage={setCurrentPage}
       />
 
-      <CadastrarPacienteModal
+      <ModalCadastrarPaciente
         visible={cadastroVisible}
         onClose={() => setCadastroVisible(false)}
       />
@@ -161,7 +159,7 @@ export default function PacientesScreen() {
               );
               router.push({
                 pathname: "/(psicologo)/registros/[id]",
-                params: { id: patient?.id ?? "", name: patient?.name ?? "" },
+                params: { id: patient?.id ?? "", name: patient?.nome ?? "" },
               });
             },
           },

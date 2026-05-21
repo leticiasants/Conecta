@@ -1,13 +1,14 @@
-import { AceitarVinculoModal } from "@/src/components/AceitarVinculoModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
-import { SolicitacaoCard } from "@/src/components/SolicitacaoCard";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
+import { CardSolicitacao } from "./components/CardSolicitacao";
+import { ModalAceitarVinculo } from "@/src/modules/paciente/components";
+
 type Solicitacao = {
   id: string;
-  name: string;
+  nome: string;
   email: string;
   crp: string;
 };
@@ -15,13 +16,13 @@ type Solicitacao = {
 const MOCK_SOLICITACOES: Solicitacao[] = [
   {
     id: "1",
-    name: "Dra. Ana Souza",
+    nome: "Dra. Ana Souza",
     email: "ana.souza@clinica.com",
     crp: "06/78901",
   },
   {
     id: "2",
-    name: "Dr. Carlos Lima",
+    nome: "Dr. Carlos Lima",
     email: "carlos.lima@psi.com",
     crp: "04/23456",
   },
@@ -72,8 +73,8 @@ export default function SolicitacoesScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <SolicitacaoCard
-            name={item.name}
+          <CardSolicitacao
+            nome={item.nome}
             email={item.email}
             crp={item.crp}
             onRecusar={() => setRecusarId(item.id)}
@@ -97,13 +98,13 @@ export default function SolicitacoesScreen() {
 
       <ConfirmModal
         visible={!!recusarId}
-        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.name ?? "este profissional"}?`}
+        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nome ?? "este profissional"}?`}
         confirmLabel="Recusar"
         onClose={() => setRecusarId(null)}
         onConfirm={handleRecusar}
       />
 
-      <AceitarVinculoModal
+      <ModalAceitarVinculo
         visible={!!aceitarId}
         onClose={() => setAceitarId(null)}
         onIniciarNovaFicha={handleIniciarNovaFicha}

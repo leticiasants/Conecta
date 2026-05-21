@@ -1,57 +1,48 @@
-
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
+import { IRelato } from "@/src/modules/paciente/ts/IRelato";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { CardRelato } from "../../(paciente)/relatos/components";
 
-type Record = {
-  id: string;
-  title: string;
-  emotion: string;
-  intensity: number;
-  description: string;
-  date: string;
-};
-
-const MOCK_RECORDS: Record[] = [
+const MOCK_RECORDS: IRelato[] = [
   {
     id: "1",
-    title: "Fiquei triste",
-    emotion: "Tristeza",
-    intensity: 6,
-    description:
+    situacao: "Fiquei triste",
+    emocao: "Tristeza",
+    intensidade: 6,
+    descricao:
       "Hoje foi um dia leve e feliz. Consegui realizar minhas tarefas com tranquilidade e ainda tive alguns momentos agradáveis ao longo do dia, como pequenas pausas para descansar e conversar. Tudo fluiu de forma natural, sem pressa ou estresse.",
-    date: "16/02/2026",
+    dataOcorrido: "16/02/2026",
   },
   {
     id: "2",
-    title: "Dia feliz",
-    emotion: "Alegria",
-    intensity: 8,
-    description:
+    situacao: "Dia feliz",
+    emocao: "Alegria",
+    intensidade: 8,
+    descricao:
       "Hoje foi um dia leve e feliz. Consegui realizar minhas tarefas com tranquilidade e ainda tive alguns momentos agradáveis ao longo do dia, como pequenas pausas para descansar e conversar. Tudo fluiu de forma natural, sem pressa ou estresse.",
-    date: "17/02/2026",
+    dataOcorrido: "17/02/2026",
   },
   {
     id: "3",
-    title: "Ansiedade no trabalho",
-    emotion: "Ansiedade",
-    intensity: 7,
-    description:
+    situacao: "Ansiedade no trabalho",
+    emocao: "Ansiedade",
+    intensidade: 7,
+    descricao:
       "Tive muitas demandas hoje e me senti sobrecarregada. As reuniões foram longas e não consegui finalizar as tarefas que havia planejado. Senti o coração acelerado em alguns momentos.",
-    date: "18/02/2026",
+    dataOcorrido: "18/02/2026",
   },
   {
     id: "4",
-    title: "Conquista do dia",
-    emotion: "Orgulho",
-    intensity: 9,
-    description:
+    situacao: "Conquista do dia",
+    emocao: "Orgulho",
+    intensidade: 9,
+    descricao:
       "Finalizei um projeto que estava pendente há semanas. Me senti muito bem ao ver o resultado. Recebi elogios da equipe e isso me motivou bastante para continuar.",
-    date: "19/02/2026",
+    dataOcorrido: "19/02/2026",
   },
 ];
 
@@ -66,9 +57,9 @@ export default function RegistrosScreen() {
 
   const filtered = MOCK_RECORDS.filter(
     (r) =>
-      r.title.toLowerCase().includes(search.toLowerCase()) ||
-      r.emotion.toLowerCase().includes(search.toLowerCase()) ||
-      String(r.intensity).includes(search),
+      r.situacao.toLowerCase().includes(search.toLowerCase()) ||
+      r.emocao.toLowerCase().includes(search.toLowerCase()) ||
+      String(r.intensidade).includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -92,9 +83,9 @@ export default function RegistrosScreen() {
 
         <View className="flex-row items-center gap-1 mb-4">
           <MaterialIcons name="person" size={16} color="#5C868E" />
-          <Text className="text-sm">
-            <Text className="font-bold text-grey-800">Paciente: </Text>
-            <Text className="text-primary">{patientName}</Text>
+          <Text className="text-sm text-primary">
+            <Text className="font-bold">Paciente: </Text>
+            <Text>{patientName}</Text>
           </Text>
         </View>
 
@@ -107,16 +98,16 @@ export default function RegistrosScreen() {
 
       <FlatList
         data={pageData}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id ?? ""}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardRelato
-            titulo={item.title}
-            emocao={item.emotion}
-            intensidade={item.intensity}
-            descricao={item.description}
-            dataOcorrido={item.date}
+            situacao={item.situacao}
+            emocao={item.emocao}
+            intensidade={item.intensidade}
+            descricao={item.descricao}
+            dataOcorrido={item.dataOcorrido}
           />
         )}
         ListEmptyComponent={

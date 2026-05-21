@@ -1,19 +1,25 @@
-import { useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
 import type { ActionPosition } from "@/src/types";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRef } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export type { ActionPosition };
 
-interface Props {
-  name: string;
-  email: string;
-  phone: string;
-  birthDate: string;
+interface Props extends Pick<
+  IDadosPaciente,
+  "nome" | "email" | "contato" | "nascimento"
+> {
   onActions: (position: ActionPosition) => void;
 }
 
-export function PatientCard({ name, email, phone, birthDate, onActions }: Props) {
+export function CardPaciente({
+  nome,
+  email,
+  contato,
+  nascimento,
+  onActions,
+}: Props) {
   const buttonRef = useRef<View>(null);
 
   function handleActions() {
@@ -34,7 +40,7 @@ export function PatientCard({ name, email, phone, birthDate, onActions }: Props)
       }}
     >
       <View className="flex-row justify-between items-start mb-1">
-        <Text className="text-base font-bold text-grey-800 flex-1">{name}</Text>
+        <Text className="text-base font-bold text-grey-800 flex-1">{nome}</Text>
         <TouchableOpacity
           onPress={handleActions}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -51,11 +57,11 @@ export function PatientCard({ name, email, phone, birthDate, onActions }: Props)
       </Text>
       <Text className="text-sm text-grey-800">
         <Text className="font-bold">Contato: </Text>
-        {phone}
+        {contato}
       </Text>
       <Text className="text-sm text-grey-800">
         <Text className="font-bold">Data de Nascimento: </Text>
-        {birthDate}
+        {nascimento}
       </Text>
     </View>
   );

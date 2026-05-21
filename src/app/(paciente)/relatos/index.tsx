@@ -1,47 +1,50 @@
-import { CardRelato } from "@/src/app/(paciente)/relatos/components/CardRelato";
 import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
-import { RelatoData, RelatoFormModal } from "@/src/components/RelatoFormModal";
 import { SearchBar } from "@/src/components/SearchBar";
+import { ModalAddRelato } from "@/src/modules/paciente/components";
+import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
+import { IRelato } from "@/src/modules/paciente/ts/IRelato";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { CardRelato } from "./components";
 
-type Relato = RelatoData & { id: string };
+type Relato = IRelato & { id: string };
 
-// const MOCK_RELATOS: Relato[] = [
-//   {
-//     id: "1",
-//     situacao: "Fiquei triste",
-//     emocao: "Tristeza",
-//     intensidade: 6,
-//     descricao:
-//       "Hoje foi um dia difícil. Senti que as coisas não estavam fluindo e me fechei um pouco. Precisei de um tempo sozinha para processar os sentimentos.",
-//     data: "16/02/2026",
-//   },
-//   {
-//     id: "2",
-//     situacao: "Dia feliz",
-//     emocao: "Alegria",
-//     intensidade: 8,
-//     descricao:
-//       "Hoje foi um dia leve e feliz. Consegui realizar minhas tarefas com tranquilidade e ainda tive alguns momentos agradáveis ao longo do dia.",
-//     data: "17/02/2026",
-//   },
-//   {
-//     id: "3",
-//     situacao: "Ansiedade no trabalho",
-//     emocao: "Ansiedade",
-//     intensidade: 7,
-//     descricao:
-//       "Tive muitas demandas hoje e me senti sobrecarregada. As reuniões foram longas e não consegui finalizar as tarefas planejadas.",
-//     data: "18/02/2026",
-//   },
-// ];
+const MOCK_RELATOS: Relato[] = [
+  {
+    id: "1",
+    situacao: "Fiquei triste",
+    emocao: "Tristeza",
+    intensidade: 6,
+    descricao:
+      "Hoje foi um dia difícil. Senti que as coisas não estavam fluindo e me fechei um pouco. Precisei de um tempo sozinha para processar os sentimentos.",
+    dataOcorrido: "16/02/2026",
+  },
+  {
+    id: "2",
+    situacao: "Dia feliz",
+    emocao: "Alegria",
+    intensidade: 8,
+    descricao:
+      "Hoje foi um dia leve e feliz. Consegui realizar minhas tarefas com tranquilidade e ainda tive alguns momentos agradáveis ao longo do dia.",
+    dataOcorrido: "17/02/2026",
+  },
+  {
+    id: "3",
+    situacao: "Ansiedade no trabalho",
+    emocao: "Ansiedade",
+    intensidade: 7,
+    descricao:
+      "Tive muitas demandas hoje e me senti sobrecarregada. As reuniões foram longas e não consegui finalizar as tarefas planejadas.",
+    dataOcorrido: "18/02/2026",
+  },
+];
 
-const MOCK_RELATOS: Relato[] = [];
+// const MOCK_RELATOS: Relato[] = [];
 
 const ITEMS_PER_PAGE = 3;
 
@@ -55,6 +58,15 @@ export default function RelatosScreen() {
   const [editData, setEditData] = useState<Relato | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [actionsState, setActionsState] = useState<ActionsState | null>(null);
+
+  const { openAdd } = useLocalSearchParams<{ openAdd?: string }>();
+
+  useEffect(() => {
+    if (openAdd === "1") {
+      setAddVisible(true);
+      router.setParams({ openAdd: undefined });
+    }
+  }, [openAdd]);
 
   const nextId = useRef(MOCK_RELATOS.length + 1);
 
@@ -76,12 +88,12 @@ export default function RelatosScreen() {
     setCurrentPage(1);
   }
 
-  function handleAdd(data: RelatoData) {
+  function handleAdd(data: IRelato) {
     const newRelato: Relato = { ...data, id: String(nextId.current++) };
     setRelatos((prev) => [newRelato, ...prev]);
   }
 
-  function handleEdit(data: RelatoData) {
+  function handleEdit(data: IRelato) {
     if (!editData) return;
     setRelatos((prev) =>
       prev.map((r) =>
@@ -144,11 +156,11 @@ export default function RelatosScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardRelato
-            titulo={item.situacao}
+            situacao={item.situacao}
             emocao={item.emocao}
             intensidade={item.intensidade}
             descricao={item.descricao}
-            dataOcorrido={item.data}
+            dataOcorrido={item.dataOcorrido}
             acoes={(position) => openActions(item.id, position)}
           />
         )}
@@ -197,16 +209,14 @@ export default function RelatosScreen() {
         ]}
       />
 
-      <RelatoFormModal
+      <ModalAddRelato
         visible={addVisible}
-        mode="add"
         onClose={() => setAddVisible(false)}
         onSave={handleAdd}
       />
 
-      <RelatoFormModal
+      <ModalEditarRelato
         visible={!!editData}
-        mode="edit"
         initialData={
           editData
             ? {
@@ -214,7 +224,7 @@ export default function RelatosScreen() {
                 emocao: editData.emocao,
                 intensidade: editData.intensidade,
                 descricao: editData.descricao,
-                data: editData.data,
+                dataOcorrido: editData.dataOcorrido,
               }
             : undefined
         }

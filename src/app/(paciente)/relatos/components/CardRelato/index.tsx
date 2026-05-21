@@ -1,19 +1,15 @@
+import { IRelato } from "@/src/modules/paciente/ts/IRelato";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-interface Props {
-  titulo: string;
-  emocao: string;
-  intensidade: number;
-  descricao: string;
-  dataOcorrido: string;
+interface Props extends IRelato {
   acoes?: (position: ActionPosition) => void;
 }
 
 export function CardRelato({
-  titulo,
+  situacao,
   emocao,
   intensidade,
   descricao,
@@ -44,7 +40,7 @@ export function CardRelato({
       <View className="px-4 pt-4 pb-3">
         <View className="flex-row items-center justify-between mb-3">
           <Text className="font-bold text-base text-primary flex-1">
-            {titulo}
+            {situacao}
           </Text>
           {acoes && (
             <TouchableOpacity

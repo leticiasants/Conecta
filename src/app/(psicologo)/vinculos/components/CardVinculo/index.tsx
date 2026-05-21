@@ -1,5 +1,6 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface Action {
   label: string;
@@ -9,14 +10,11 @@ interface Action {
   disabled?: boolean;
 }
 
-interface Props {
-  name: string;
-  email: string;
-  phone: string;
+interface Props extends Pick<IDadosPaciente, "nome" | "email" | "contato"> {
   action: Action;
 }
 
-export function VinculoCard({ name, email, phone, action }: Props) {
+export function CardVinculo({ nome, email, contato, action }: Props) {
   const isFilled = action.variant === "filled";
 
   return (
@@ -31,14 +29,14 @@ export function VinculoCard({ name, email, phone, action }: Props) {
         shadowRadius: 3,
       }}
     >
-      <Text className="font-bold text-base text-grey-800 mb-1">{name}</Text>
+      <Text className="font-bold text-base text-grey-800 mb-1">{nome}</Text>
       <Text className="text-sm text-grey-800 mb-0.5">
         <Text className="font-bold">E-mail: </Text>
         {email}
       </Text>
       <Text className="text-sm text-grey-800 mb-3">
         <Text className="font-bold">Contato: </Text>
-        {phone}
+        {contato}
       </Text>
 
       <TouchableOpacity

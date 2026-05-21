@@ -1,42 +1,41 @@
-import { View, Text, FlatList } from "react-native";
-import { useState } from "react";
+import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
-import { VinculoCard } from "@/src/components/VinculoCard";
-import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { FlatList, Text, View } from "react-native";
+import { CardVinculo } from "./components/CardVinculo";
 
-type Vinculo = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-};
+interface VinculoPendente extends Pick<
+  IDadosPaciente,
+  "id" | "nome" | "email" | "contato"
+> {}
 
-const MOCK_VINCULOS: Vinculo[] = [
+const MOCK_VINCULOS: VinculoPendente[] = [
   {
     id: "1",
-    name: "Thiago Terra Silva",
+    nome: "Thiago Terra Silva",
     email: "thiago.terra.silva@hotmail.com",
-    phone: "(35) 99999-9999",
+    contato: "(35) 99999-9999",
   },
   {
     id: "2",
-    name: "Beatriz Ramos Costa",
+    nome: "Beatriz Ramos Costa",
     email: "beatriz.ramos@gmail.com",
-    phone: "(11) 98888-8888",
+    contato: "(11) 98888-8888",
   },
   {
     id: "3",
-    name: "Lucas Fernandes Rocha",
+    nome: "Lucas Fernandes Rocha",
     email: "lucas.fernandes@gmail.com",
-    phone: "(21) 97777-7777",
+    contato: "(21) 97777-7777",
   },
   {
     id: "4",
-    name: "Camila Souza Almeida",
+    nome: "Camila Souza Almeida",
     email: "camila.souza@gmail.com",
-    phone: "(31) 96666-6666",
+    contato: "(31) 96666-6666",
   },
 ];
 
@@ -50,9 +49,9 @@ export default function VinculosPendentesScreen() {
 
   const filtered = vinculos.filter(
     (v) =>
-      v.name.toLowerCase().includes(search.toLowerCase()) ||
+      v.nome.toLowerCase().includes(search.toLowerCase()) ||
       v.email.toLowerCase().includes(search.toLowerCase()) ||
-      v.phone.includes(search),
+      v.contato?.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -94,10 +93,10 @@ export default function VinculosPendentesScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <VinculoCard
-            name={item.name}
+          <CardVinculo
+            nome={item.nome}
             email={item.email}
-            phone={item.phone}
+            contato={item.contato ?? ""}
             action={{
               label: "Remover solicitação",
               icon: "person-remove",

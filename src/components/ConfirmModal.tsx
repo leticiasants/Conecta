@@ -1,4 +1,4 @@
-import { Modal, View, Text, TouchableOpacity, Pressable } from "react-native";
+import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   visible: boolean;
@@ -37,14 +37,14 @@ export function ConfirmModal({
               shadowRadius: 12,
             }}
           >
-            <Text className="text-2xl font-bold text-center text-grey-800 mb-8 leading-9">
+            <Text className="text-base font-semibold text-center text-grey-800 mb-6">
               {message}
             </Text>
 
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={onClose}
-                className="flex-1 py-3 rounded-2xl items-center border-2 border-primary"
+                className="flex-1 py-2 rounded-2xl items-center border-2 border-primary"
               >
                 <Text className="font-semibold text-base text-primary">
                   Cancelar

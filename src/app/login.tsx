@@ -9,7 +9,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   function handleLogin() {
-    router.replace("/(paciente)");
+    router.replace("/(psicologo)");
   }
 
   return (

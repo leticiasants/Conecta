@@ -1,9 +1,10 @@
-import { Tabs } from "expo-router";
-import { View, Image, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
 import { Sidebar } from "@/src/components/Sidebar";
-import { CadastrarPacienteModal } from "@/src/components/CadastrarPacienteModal";
+import { ModalCadastrarPaciente } from "@/src/modules/psicologo/components";
+
+import { MaterialIcons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { useState } from "react";
+import { Image, TouchableOpacity, View } from "react-native";
 
 const ICON_COLOR = "#2A6F68";
 
@@ -68,33 +69,49 @@ export default function PsicologoLayout() {
       />
 
       <Sidebar
-        visible={sidebarVisible}
+        visivel={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
-        items={[
-          { icon: "home", label: "Home", route: "/(psicologo)" },
+        itens={[
+          { icone: "home", rotulo: "Home", rota: "/(psicologo)" },
           {
-            icon: "people",
-            label: "Pacientes",
-            route: "/(psicologo)/pacientes",
-            subItems: [
-              { label: "Meus Pacientes", route: "/(psicologo)/pacientes" },
-              { label: "Cadastrar Pacientes", onPress: () => { setSidebarVisible(false); setCadastroVisible(true); } },
+            icone: "people",
+            rotulo: "Pacientes",
+            rota: "/(psicologo)/pacientes",
+            subItens: [
+              { rotulo: "Meus Pacientes", rota: "/(psicologo)/pacientes" },
+              {
+                rotulo: "Cadastrar Pacientes",
+                onPress: () => {
+                  setSidebarVisible(false);
+                  setCadastroVisible(true);
+                },
+              },
             ],
           },
           {
-            icon: "person-add",
-            label: "Vínculos",
-            route: "/(psicologo)/vinculos/solicitar",
-            subItems: [
-              { label: "Solicitar Vínculo", route: "/(psicologo)/vinculos/solicitar" },
-              { label: "Vínculos Pendentes", route: "/(psicologo)/vinculos/pendentes" },
+            icone: "group-add",
+            rotulo: "Vínculos",
+            rota: "/(psicologo)/vinculos/solicitar",
+            subItens: [
+              {
+                rotulo: "Solicitar Vínculo",
+                rota: "/(psicologo)/vinculos/solicitar",
+              },
+              {
+                rotulo: "Vínculos Pendentes",
+                rota: "/(psicologo)/vinculos/pendentes",
+              },
             ],
           },
-          { icon: "person", label: "Meus Dados", route: "/(psicologo)/meus-dados" },
+          {
+            icone: "person",
+            rotulo: "Meus Dados",
+            rota: "/(psicologo)/meus-dados",
+          },
         ]}
       />
 
-      <CadastrarPacienteModal
+      <ModalCadastrarPaciente
         visible={cadastroVisible}
         onClose={() => setCadastroVisible(false)}
       />

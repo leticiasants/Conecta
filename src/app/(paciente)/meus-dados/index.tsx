@@ -1,21 +1,22 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { EditarDadosPacienteModal } from "@/src/components/EditarDadosPacienteModal";
 import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { ModalEditarDados } from "@/src/modules/paciente/components";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const MOCK_DADOS = {
-  name: "Maria Silva",
+  id: "1",
+  nome: "Maria Silva",
   email: "maria.silva@gmail.com",
   cpf: "123.456.789-00",
-  phone: "(35) 99999-9999",
-  emergencyPhone: "(35) 98888-8888",
-  birthDate: "12/04/1995",
+  contato: "(35) 99999-9999",
+  contatoEmergencia: "(35) 98888-8888",
+  nascimento: "12/04/1995",
 };
 
-export default function MeusDadosPacienteScreen() {
+export default function MeusDadosScreen() {
   const [dados] = useState(MOCK_DADOS);
   const [editarVisible, setEditarVisible] = useState(false);
   const [senhaVisible, setSenhaVisible] = useState(false);
@@ -42,7 +43,11 @@ export default function MeusDadosPacienteScreen() {
             onPress={() => setEditarVisible(true)}
             className="w-11 h-11 rounded-full bg-primary items-center justify-center"
           >
-            <MaterialIcons name="edit" size={20} color="white" />
+            <MaterialIcons
+              name="drive-file-rename-outline"
+              size={20}
+              color="white"
+            />
           </TouchableOpacity>
         </View>
 
@@ -57,14 +62,14 @@ export default function MeusDadosPacienteScreen() {
             shadowRadius: 3,
           }}
         >
-          <DataRow label="Nome" value={dados.name} />
+          <DataRow label="Nome" value={dados.nome} />
           <DataRow label="E-mail" value={dados.email} underline />
           <DataRow label="CPF" value={dados.cpf} />
-          <DataRow label="Data de Nascimento" value={dados.birthDate} />
-          <DataRow label="Contato" value={dados.phone} />
+          <DataRow label="Data de Nascimento" value={dados.nascimento} />
+          <DataRow label="Contato" value={dados.contato} />
           <DataRow
             label="Contato de emergência"
-            value={dados.emergencyPhone}
+            value={dados.contatoEmergencia}
             last
           />
         </View>
@@ -105,7 +110,7 @@ export default function MeusDadosPacienteScreen() {
           }}
         >
           <MaterialIcons name="delete" size={22} color="#990000" />
-          <View>
+          <View className="flex pr-2">
             <Text className="text-base font-bold text-red">Excluir Conta</Text>
             <Text className="text-xs text-grey-500">
               Encerrando sua jornada? A despedida é difícil, mas estamos aqui.
@@ -114,7 +119,7 @@ export default function MeusDadosPacienteScreen() {
         </TouchableOpacity>
       </View>
 
-      <EditarDadosPacienteModal
+      <ModalEditarDados
         visible={editarVisible}
         onClose={() => setEditarVisible(false)}
         initialData={dados}

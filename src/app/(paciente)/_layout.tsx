@@ -49,28 +49,28 @@ export default function PacienteLayout() {
       />
 
       <Sidebar
-        visible={sidebarVisible}
+        visivel={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
-        items={[
-          { icon: "home", label: "Home", route: "/(paciente)" },
+        itens={[
+          { icone: "home", rotulo: "Home", rota: "/(paciente)" },
           {
-            icon: "format-list-bulleted",
-            label: "Relatos",
-            route: "/(paciente)/relatos",
-            subItems: [
-              { label: "Meus Relatos", route: "/(paciente)/relatos" },
-              { label: "Adicionar Relato", route: "/(paciente)/relatos" },
+            icone: "format-list-bulleted",
+            rotulo: "Relatos",
+            rota: "/(paciente)/relatos",
+            subItens: [
+              { rotulo: "Meus Relatos", rota: "/(paciente)/relatos" },
+              { rotulo: "Adicionar Relato", rota: "/(paciente)/relatos?openAdd=1" },
             ],
           },
           {
-            icon: "group-add",
-            label: "Solicitações de Vínculo",
-            route: "/(paciente)/solicitacoes",
+            icone: "group-add",
+            rotulo: "Solicitações de Vínculo",
+            rota: "/(paciente)/solicitacoes",
           },
           {
-            icon: "person",
-            label: "Meus Dados",
-            route: "/(paciente)/meus-dados",
+            icone: "person",
+            rotulo: "Meus Dados",
+            rota: "/(paciente)/meus-dados",
           },
         ]}
       />

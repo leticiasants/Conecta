@@ -1,27 +1,19 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState, type ReactNode } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
-  View,
+  Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: {
-    name: string;
-    email: string;
-    cpf: string;
-    phone: string;
-    emergencyPhone: string;
-    birthDate: string;
-  };
 }
 
 function formatCPF(value: string): string {
@@ -39,43 +31,38 @@ function formatDate(value: string): string {
   return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
 }
 
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <View className="mb-5">
       <Text className="text-grey-800 text-sm mb-1">
-        {label}
-        {required && <Text className="text-primary"> *</Text>}
+        {label} <Text className="text-primary">*</Text>
       </Text>
       {children}
     </View>
   );
 }
 
-export function EditarDadosPacienteModal({
-  visible,
-  onClose,
-  initialData,
-}: Props) {
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [email, setEmail] = useState(initialData?.email ?? "");
-  const [cpf, setCpf] = useState(initialData?.cpf ?? "");
-  const [phone, setPhone] = useState(initialData?.phone ?? "");
-  const [emergencyPhone, setEmergencyPhone] = useState(
-    initialData?.emergencyPhone ?? ""
-  );
-  const [birthDate, setBirthDate] = useState(initialData?.birthDate ?? "");
+export function ModalCadastrarPaciente({ visible, onClose }: Props) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  function handleSave() {
-    // TODO: integrar com API
+  function handleClose() {
+    setName("");
+    setEmail("");
+    setCpf("");
+    setBirthDate("");
+    setPassword("");
+    setShowPassword(false);
     onClose();
+  }
+
+  function handleCadastrar() {
+    // TODO: integrar com API
+    handleClose();
   }
 
   return (
@@ -83,28 +70,34 @@ export function EditarDadosPacienteModal({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View className="flex-1 bg-black/40 justify-center items-center px-5">
         <KeyboardAvoidingView
-          className="w-full"
+          className="w-full justify-center"
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View className="bg-white rounded-3xl w-full">
+          <View className="bg-white rounded-3xl min-w-full max-h-full">
             <ScrollView
-              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+              contentContainerStyle={{
+                paddingHorizontal: 24,
+                paddingBottom: 40,
+              }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              <TouchableOpacity onPress={onClose} className="self-end pt-4 pb-2">
+              <TouchableOpacity
+                onPress={handleClose}
+                className="self-end pt-4 pb-2"
+              >
                 <MaterialIcons name="close" size={24} color="#3D3D3D" />
               </TouchableOpacity>
 
               <Text className="text-4xl font-bold text-primary text-center mb-8">
-                Editar Dados
+                Cadastro
               </Text>
 
-              <Field label="Nome" required>
+              <Field label="Nome">
                 <TextInput
                   className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
                   placeholder="João da Silva"
@@ -114,7 +107,7 @@ export function EditarDadosPacienteModal({
                 />
               </Field>
 
-              <Field label="E-mail" required>
+              <Field label="E-mail">
                 <TextInput
                   className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
                   placeholder="exemplo@mail.com"
@@ -126,7 +119,7 @@ export function EditarDadosPacienteModal({
                 />
               </Field>
 
-              <Field label="CPF" required>
+              <Field label="CPF">
                 <TextInput
                   className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
                   placeholder="XXX.XXX.XXX-XX"
@@ -137,29 +130,7 @@ export function EditarDadosPacienteModal({
                 />
               </Field>
 
-              <Field label="Contato">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="(35)99999-9999"
-                  placeholderTextColor="#aaa"
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                />
-              </Field>
-
-              <Field label="Contato de emergência">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="(35)99999-9999"
-                  placeholderTextColor="#aaa"
-                  value={emergencyPhone}
-                  onChangeText={setEmergencyPhone}
-                  keyboardType="phone-pad"
-                />
-              </Field>
-
-              <Field label="Data de Nascimento" required>
+              <Field label="Data de Nascimento">
                 <TextInput
                   className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
                   placeholder="DD/MM/AAAA"
@@ -170,11 +141,35 @@ export function EditarDadosPacienteModal({
                 />
               </Field>
 
+              <Field label="Senha">
+                <View className="bg-gray-100 rounded-xl flex-row items-center px-4">
+                  <TextInput
+                    className="flex-1 py-4 text-sm text-grey-800"
+                    placeholder="••••••••"
+                    placeholderTextColor="#aaa"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <MaterialIcons
+                      name={showPassword ? "visibility" : "visibility-off"}
+                      size={22}
+                      color="#aaa"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </Field>
+
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
-                onPress={handleSave}
+                onPress={handleCadastrar}
               >
-                <Text className="text-white font-bold text-base">Salvar</Text>
+                <Text className="text-white font-bold text-base">
+                  Cadastrar
+                </Text>
               </TouchableOpacity>
             </ScrollView>
           </View>

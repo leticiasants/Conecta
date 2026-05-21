@@ -1,16 +1,18 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { EditarDadosModal } from "@/src/components/EditarDadosModal";
+import { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+
 import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { ModalEditarDados } from "@/src/modules/psicologo/components";
 import { router } from "expo-router";
 
 const MOCK_DADOS = {
-  name: "Letícia Vitória dos Santos",
+  id: "1",
+  nome: "Letícia Vitória dos Santos",
   email: "leticia@gmail.com",
   crp: "01/12345",
-  phone: "(35) 99999-9999",
+  contato: "(35) 99999-9999",
 };
 
 export default function MeusDadosScreen() {
@@ -55,10 +57,10 @@ export default function MeusDadosScreen() {
             shadowRadius: 3,
           }}
         >
-          <DataRow label="Nome" value={dados.name} />
-          <DataRow label="E-mail" value={dados.email} underline />
+          <DataRow label="Nome" value={dados.nome} />
+          <DataRow label="E-mail" value={dados.email} />
           <DataRow label="CRP" value={dados.crp} />
-          <DataRow label="Contato" value={dados.phone} last />
+          <DataRow label="Contato" value={dados.contato} last />
         </View>
 
         <TouchableOpacity
@@ -97,7 +99,7 @@ export default function MeusDadosScreen() {
           }}
         >
           <MaterialIcons name="delete" size={22} color="#990000" />
-          <View>
+          <View className="flex pr-2">
             <Text className="text-base font-bold text-red">Excluir Conta</Text>
             <Text className="text-xs text-grey-500">
               Encerrando sua jornada? A despedida é difícil, mas estamos aqui.
@@ -106,7 +108,7 @@ export default function MeusDadosScreen() {
         </TouchableOpacity>
       </View>
 
-      <EditarDadosModal
+      <ModalEditarDados
         visible={editarVisible}
         onClose={() => setEditarVisible(false)}
         initialData={dados}
@@ -143,11 +145,7 @@ function DataRow({
   return (
     <View className={last ? "" : "mb-4"}>
       <Text className="text-xs text-grey-500 mb-0.5">{label}</Text>
-      <Text
-        className={`text-base font-bold ${underline ? "text-primary underline" : "text-grey-800"}`}
-      >
-        {value}
-      </Text>
+      <Text className="text-base font-semibold text-grey-800">{value}</Text>
     </View>
   );
 }

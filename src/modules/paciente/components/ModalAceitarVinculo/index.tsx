@@ -7,7 +7,7 @@ interface Props {
   onCompartilharRegistros: () => void;
 }
 
-export function AceitarVinculoModal({
+export function ModalAceitarVinculo({
   visible,
   onClose,
   onIniciarNovaFicha,

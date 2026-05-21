@@ -1,16 +1,14 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { IDadosPsicologo } from "@/src/modules/psicologo/ts/IDadosPsicologo";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Text, TouchableOpacity, View } from "react-native";
 
-interface Props {
-  name: string;
-  email: string;
-  crp: string;
+interface Props extends Pick<IDadosPsicologo, "nome" | "email" | "crp"> {
   onRecusar: () => void;
   onAceitar: () => void;
 }
 
-export function SolicitacaoCard({
-  name,
+export function CardSolicitacao({
+  nome,
   email,
   crp,
   onRecusar,
@@ -28,9 +26,9 @@ export function SolicitacaoCard({
         shadowRadius: 3,
       }}
     >
-      <Text className="font-bold text-base text-grey-800 mb-1">{name}</Text>
+      <Text className="font-bold text-base text-grey-800 mb-1">{nome}</Text>
       <Text className="text-sm text-grey-800 mb-0.5">
-        <Text className="font-bold">E-mail: </Text>
+        <Text className="font-bold no-underline">E-mail: </Text>
         {email}
       </Text>
       <Text className="text-sm text-grey-800 mb-3">
@@ -44,7 +42,9 @@ export function SolicitacaoCard({
           className="flex-1 flex-row items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-primary"
         >
           <MaterialIcons name="person-remove" size={16} color="#5C868E" />
-          <Text className="text-xs font-bold text-primary">Recusar vínculo</Text>
+          <Text className="text-xs font-bold text-primary">
+            Recusar vínculo
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity

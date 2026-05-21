@@ -11,35 +11,35 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SIDEBAR_WIDTH = Dimensions.get("window").width * 0.78;
+const LARGURA_SIDEBAR = Dimensions.get("window").width * 0.78;
 
-interface SubItemConfig {
-  label: string;
-  route?: string;
+interface ConfigSubItem {
+  rotulo: string;
+  rota?: string;
   onPress?: () => void;
 }
 
-interface NavItemConfig {
-  icon: keyof typeof MaterialIcons.glyphMap;
-  label: string;
-  route?: string;
+interface ConfigItemNav {
+  icone: keyof typeof MaterialIcons.glyphMap;
+  rotulo: string;
+  rota?: string;
   onPress?: () => void;
-  subItems?: SubItemConfig[];
+  subItens?: ConfigSubItem[];
 }
 
-interface Props {
-  visible: boolean;
+interface Propriedades {
+  visivel: boolean;
   onClose: () => void;
-  items: NavItemConfig[];
+  itens: ConfigItemNav[];
 }
 
-function NavItem({
-  icon,
-  label,
+function ItemNav({
+  icone,
+  rotulo,
   onPress,
 }: {
-  icon: keyof typeof MaterialIcons.glyphMap;
-  label: string;
+  icone: keyof typeof MaterialIcons.glyphMap;
+  rotulo: string;
   onPress: () => void;
 }) {
   return (
@@ -53,13 +53,13 @@ function NavItem({
         paddingHorizontal: 20,
       }}
     >
-      <MaterialIcons name={icon} size={22} color="#1a1a1a" />
-      <Text style={{ fontSize: 16, color: "#1a1a1a" }}>{label}</Text>
+      <MaterialIcons name={icone} size={22} color="#1a1a1a" />
+      <Text style={{ fontSize: 16, color: "#1a1a1a" }}>{rotulo}</Text>
     </TouchableOpacity>
   );
 }
 
-function SubItem({ label, onPress }: { label: string; onPress: () => void }) {
+function ItemSub({ rotulo, onPress }: { rotulo: string; onPress: () => void }) {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -72,43 +72,43 @@ function SubItem({ label, onPress }: { label: string; onPress: () => void }) {
         marginLeft: 20,
       }}
     >
-      <Text style={{ fontSize: 15, color: "#1a1a1a" }}>{label}</Text>
+      <Text style={{ fontSize: 15, color: "#1a1a1a" }}>{rotulo}</Text>
     </TouchableOpacity>
   );
 }
 
-export function Sidebar({ visible, onClose, items }: Props) {
+export function Sidebar({ visivel, onClose, itens }: Propriedades) {
   const insets = useSafeAreaInsets();
-  const translateX = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(-LARGURA_SIDEBAR)).current;
+  const opacidadeFundo = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(translateX, {
-        toValue: visible ? 0 : -SIDEBAR_WIDTH,
+        toValue: visivel ? 0 : -LARGURA_SIDEBAR,
         duration: 250,
         useNativeDriver: true,
       }),
-      Animated.timing(backdropOpacity, {
-        toValue: visible ? 1 : 0,
+      Animated.timing(opacidadeFundo, {
+        toValue: visivel ? 1 : 0,
         duration: 250,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [visible]);
+  }, [visivel]);
 
-  function nav(route: string) {
+  function navegar(rota: string) {
     onClose();
-    router.push(route as any);
+    router.push(rota as any);
   }
 
-  function handleLogout() {
+  function aoSair() {
     onClose();
     router.replace("/login");
   }
 
-  function resolvePress(config: { route?: string; onPress?: () => void }) {
-    if (config.route) return () => nav(config.route!);
+  function resolverAcao(config: { rota?: string; onPress?: () => void }) {
+    if (config.rota) return () => navegar(config.rota!);
     if (config.onPress) return config.onPress;
     return () => {};
   }
@@ -116,7 +116,7 @@ export function Sidebar({ visible, onClose, items }: Props) {
   return (
     <View
       style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
-      pointerEvents={visible ? "auto" : "none"}
+      pointerEvents={visivel ? "auto" : "none"}
     >
       <Pressable
         style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
@@ -126,7 +126,7 @@ export function Sidebar({ visible, onClose, items }: Props) {
           style={{
             flex: 1,
             backgroundColor: "rgba(0,0,0,0.5)",
-            opacity: backdropOpacity,
+            opacity: opacidadeFundo,
           }}
         />
       </Pressable>
@@ -138,7 +138,7 @@ export function Sidebar({ visible, onClose, items }: Props) {
           top: 0,
           left: 0,
           bottom: 0,
-          width: SIDEBAR_WIDTH,
+          width: LARGURA_SIDEBAR,
           transform: [{ translateX }],
         }}
       >
@@ -156,18 +156,18 @@ export function Sidebar({ visible, onClose, items }: Props) {
         </View>
 
         <View style={{ flex: 1, paddingVertical: 8 }}>
-          {items.map((item, i) => (
+          {itens.map((item, i) => (
             <View key={i}>
-              <NavItem
-                icon={item.icon}
-                label={item.label}
-                onPress={resolvePress(item)}
+              <ItemNav
+                icone={item.icone}
+                rotulo={item.rotulo}
+                onPress={resolverAcao(item)}
               />
-              {item.subItems?.map((sub, j) => (
-                <SubItem
+              {item.subItens?.map((sub, j) => (
+                <ItemSub
                   key={j}
-                  label={sub.label}
-                  onPress={resolvePress(sub)}
+                  rotulo={sub.rotulo}
+                  onPress={resolverAcao(sub)}
                 />
               ))}
             </View>
@@ -175,7 +175,7 @@ export function Sidebar({ visible, onClose, items }: Props) {
         </View>
 
         <TouchableOpacity
-          onPress={handleLogout}
+          onPress={aoSair}
           style={{
             flexDirection: "row",
             alignItems: "center",

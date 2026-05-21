@@ -36,7 +36,7 @@ export function ActionsDropdownModal({
   const dropdownX = position
     ? Math.min(
         SCREEN_WIDTH - DROPDOWN_WIDTH - 8,
-        position.x + position.width - DROPDOWN_WIDTH
+        position.x + position.width - DROPDOWN_WIDTH,
       )
     : 0;
   const dropdownY = position ? position.y + position.height + 6 : 0;
@@ -57,8 +57,6 @@ export function ActionsDropdownModal({
             width: DROPDOWN_WIDTH,
             backgroundColor: "white",
             borderRadius: 8,
-            borderLeftWidth: 4,
-            borderLeftColor: "#5C868E",
             elevation: 8,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },

@@ -1,25 +1,21 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
-  View,
+  Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { IDadosPsicologo } from "../../ts/IDadosPsicologo";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: {
-    name: string;
-    email: string;
-    crp: string;
-    phone: string;
-  };
+  initialData?: IDadosPsicologo;
 }
 
 function Field({
@@ -42,11 +38,11 @@ function Field({
   );
 }
 
-export function EditarDadosModal({ visible, onClose, initialData }: Props) {
-  const [name, setName] = useState(initialData?.name ?? "");
+export function ModalEditarDados({ visible, onClose, initialData }: Props) {
+  const [name, setName] = useState(initialData?.nome ?? "");
   const [email, setEmail] = useState(initialData?.email ?? "");
   const [crp, setCrp] = useState(initialData?.crp ?? "");
-  const [phone, setPhone] = useState(initialData?.phone ?? "");
+  const [phone, setPhone] = useState(initialData?.contato ?? "");
 
   function handleSave() {
     // TODO: integrar com API
@@ -67,11 +63,17 @@ export function EditarDadosModal({ visible, onClose, initialData }: Props) {
         >
           <View className="bg-white rounded-3xl w-full">
             <ScrollView
-              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+              contentContainerStyle={{
+                paddingHorizontal: 24,
+                paddingBottom: 40,
+              }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              <TouchableOpacity onPress={onClose} className="self-end pt-4 pb-2">
+              <TouchableOpacity
+                onPress={onClose}
+                className="self-end pt-4 pb-2"
+              >
                 <MaterialIcons name="close" size={24} color="#3D3D3D" />
               </TouchableOpacity>
 

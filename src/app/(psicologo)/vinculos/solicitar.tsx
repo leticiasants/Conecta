@@ -1,41 +1,40 @@
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
-import { VinculoCard } from "@/src/components/VinculoCard";
+import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
+import { CardVinculo } from "./components/CardVinculo";
 
-type Paciente = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-};
+interface Paciente extends Pick<
+  IDadosPaciente,
+  "id" | "nome" | "email" | "contato"
+> {}
 
 const MOCK_PACIENTES: Paciente[] = [
   {
     id: "1",
-    name: "Thiago Terra Silva",
+    nome: "Thiago Terra Silva",
     email: "thiago.terra.silva@hotmail.com",
-    phone: "(35) 99999-9999",
+    contato: "(35) 99999-9999",
   },
   {
     id: "2",
-    name: "Beatriz Ramos Costa",
+    nome: "Beatriz Ramos Costa",
     email: "beatriz.ramos@gmail.com",
-    phone: "(11) 98888-8888",
+    contato: "(11) 98888-8888",
   },
   {
     id: "3",
-    name: "Lucas Fernandes Rocha",
+    nome: "Lucas Fernandes Rocha",
     email: "lucas.fernandes@gmail.com",
-    phone: "(21) 97777-7777",
+    contato: "(21) 97777-7777",
   },
   {
     id: "4",
-    name: "Camila Souza Almeida",
+    nome: "Camila Souza Almeida",
     email: "camila.souza@gmail.com",
-    phone: "(31) 96666-6666",
+    contato: "(31) 96666-6666",
   },
 ];
 
@@ -48,9 +47,9 @@ export default function SolicitarVinculoScreen() {
 
   const filtered = MOCK_PACIENTES.filter(
     (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.nome.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase()) ||
-      p.phone.includes(search),
+      p.contato?.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -94,10 +93,10 @@ export default function SolicitarVinculoScreen() {
         renderItem={({ item }) => {
           const jaSolicitado = solicitados.has(item.id);
           return (
-            <VinculoCard
-              name={item.name}
+            <CardVinculo
+              nome={item.nome}
               email={item.email}
-              phone={item.phone}
+              contato={item.contato ?? ""}
               action={{
                 label: jaSolicitado ? "Solicitado" : "Solicitar vínculo",
                 icon: "person-add",

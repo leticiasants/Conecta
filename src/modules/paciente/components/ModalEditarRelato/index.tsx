@@ -1,31 +1,23 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
+import { useState } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
-  View,
+  Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import Slider from "@react-native-community/slider";
-
-export interface RelatoData {
-  situacao: string;
-  emocao: string;
-  intensidade: number;
-  descricao: string;
-  data: string;
-}
+import { IRelato } from "../../ts/IRelato";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  mode: "add" | "edit";
-  initialData?: RelatoData;
-  onSave: (data: RelatoData) => void;
+  initialData?: IRelato;
+  onSave: (data: IRelato) => void;
 }
 
 function formatDate(value: string): string {
@@ -52,24 +44,23 @@ function Field({
   );
 }
 
-const EMPTY: RelatoData = {
+const EMPTY: IRelato = {
   situacao: "",
   emocao: "",
   intensidade: 5,
   descricao: "",
-  data: "",
+  dataOcorrido: "",
 };
 
-export function RelatoFormModal({
+export function ModalEditarRelato({
   visible,
   onClose,
-  mode,
   initialData,
   onSave,
 }: Props) {
-  const [form, setForm] = useState<RelatoData>(initialData ?? EMPTY);
+  const [form, setForm] = useState<IRelato>(initialData ?? EMPTY);
 
-  function set<K extends keyof RelatoData>(key: K, value: RelatoData[K]) {
+  function set<K extends keyof IRelato>(key: K, value: IRelato[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -85,8 +76,6 @@ export function RelatoFormModal({
     onClose();
   }
 
-  const isEdit = mode === "edit";
-
   return (
     <Modal
       visible={visible}
@@ -101,7 +90,10 @@ export function RelatoFormModal({
         >
           <View className="bg-white rounded-3xl w-full">
             <ScrollView
-              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+              contentContainerStyle={{
+                paddingHorizontal: 24,
+                paddingBottom: 40,
+              }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
@@ -113,7 +105,7 @@ export function RelatoFormModal({
               </TouchableOpacity>
 
               <Text className="text-4xl font-bold text-primary text-center mb-8">
-                {isEdit ? "Editar Relato" : "Adicionar Relato"}
+                Editar Relato
               </Text>
 
               <Field label="Situação">
@@ -138,8 +130,7 @@ export function RelatoFormModal({
 
               <View className="mb-5">
                 <Text className="text-grey-800 text-sm mb-1">
-                  Intensidade da emoção{" "}
-                  <Text className="text-primary">*</Text>
+                  Intensidade da emoção <Text className="text-primary">*</Text>
                 </Text>
                 <View className="flex-row justify-between mb-1">
                   <Text className="text-xs text-primary font-bold">1</Text>
@@ -176,8 +167,8 @@ export function RelatoFormModal({
                   className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
                   placeholder="DD/MM/AAAA"
                   placeholderTextColor="#aaa"
-                  value={form.data}
-                  onChangeText={(v) => set("data", formatDate(v))}
+                  value={form.dataOcorrido}
+                  onChangeText={(v) => set("dataOcorrido", formatDate(v))}
                   keyboardType="numeric"
                 />
               </Field>
@@ -186,9 +177,7 @@ export function RelatoFormModal({
                 className="bg-primary rounded-xl py-4 items-center mt-2"
                 onPress={handleSubmit}
               >
-                <Text className="text-white font-bold text-base">
-                  {isEdit ? "Salvar" : "Adicionar"}
-                </Text>
+                <Text className="text-white font-bold text-base">Salvar</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
