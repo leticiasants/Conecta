@@ -2,7 +2,7 @@ import { Sidebar } from "@/src/components/Sidebar";
 import { ModalCadastrarPaciente } from "@/src/modules/psicologo/components";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 
@@ -45,7 +45,10 @@ export default function PsicologoLayout() {
           ),
 
           headerRight: () => (
-            <View className="flex-row items-center gap-2">
+            <TouchableOpacity
+              onPress={() => router.push("/(psicologo)")}
+              className="flex-row items-center gap-2 pr-5"
+            >
               <Image
                 source={require("@/src/assets/logo/logo_img_conecta.png")}
                 style={{
@@ -63,7 +66,7 @@ export default function PsicologoLayout() {
                 }}
                 resizeMode="contain"
               />
-            </View>
+            </TouchableOpacity>
           ),
         }}
       />

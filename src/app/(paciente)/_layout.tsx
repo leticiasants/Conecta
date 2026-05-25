@@ -1,6 +1,6 @@
 import { Sidebar } from "@/src/components/Sidebar";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 
@@ -20,7 +20,8 @@ export default function PacienteLayout() {
           headerTitle: () => null,
 
           headerLeftContainerStyle: { paddingLeft: 5 },
-          headerRightContainerStyle: { paddingRight: 30 },
+
+          headerRightContainerStyle: { paddingRight: 5 },
 
           headerLeft: () => (
             <TouchableOpacity
@@ -32,7 +33,10 @@ export default function PacienteLayout() {
           ),
 
           headerRight: () => (
-            <View className="flex-row items-center gap-2">
+            <TouchableOpacity
+              onPress={() => router.push("/(paciente)")}
+              className="flex-row items-center gap-2 pr-5"
+            >
               <Image
                 source={require("@/src/assets/logo/logo_img_conecta.png")}
                 style={{ width: 35, height: 35 }}
@@ -43,7 +47,7 @@ export default function PacienteLayout() {
                 style={{ width: 85, height: 30 }}
                 resizeMode="contain"
               />
-            </View>
+            </TouchableOpacity>
           ),
         }}
       />
@@ -59,7 +63,10 @@ export default function PacienteLayout() {
             rota: "/(paciente)/relatos",
             subItens: [
               { rotulo: "Meus Relatos", rota: "/(paciente)/relatos" },
-              { rotulo: "Adicionar Relato", rota: "/(paciente)/relatos?openAdd=1" },
+              {
+                rotulo: "Adicionar Relato",
+                rota: "/(paciente)/relatos?openAdd=1",
+              },
             ],
           },
           {
