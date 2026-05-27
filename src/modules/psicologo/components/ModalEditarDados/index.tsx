@@ -1,6 +1,6 @@
 import { useAuth } from "@/src/contexts/AuthContext";
-import { formatContato, formatCRP } from "@/src/utils/formatters";
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
+import { formatContato, formatCRP } from "@/src/utils/formatters";
 import {
   EMAIL_PATTERN,
   validarCRP,
@@ -62,7 +62,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
         contato: initialData?.contato ?? "",
       });
     }
-  }, [visible]);
+  }, []);
 
   async function onSubmit(data: FormData) {
     if (!userProfile) return;

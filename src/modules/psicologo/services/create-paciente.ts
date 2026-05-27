@@ -11,7 +11,6 @@ export async function createPaciente(dados: {
   psicologoId: string;
   dataNasc?: string;
 }): Promise<string> {
-  console.log("Criando paciente com os seguintes dados:", dados);
   const secondaryApp = initializeApp(firebaseConfig, `reg-pac-${Date.now()}`);
   const secondaryAuth = getAuth(secondaryApp);
 

@@ -3,8 +3,8 @@ import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { IPacienteComSolicitacao } from "@/src/modules/paciente/ts/IPaciente";
+import { deleteSolicitacaoVinculo } from "@/src/modules/psicologo/services/delete-solicitacao-vinculo";
 import { getAllSolicitacaoVinculo } from "@/src/modules/psicologo/services/get-all-solicitacao-vinculo";
-import { cancelarSolicitacao } from "@/src/services/solicitacaoService";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
@@ -64,14 +64,29 @@ export default function VinculosPendentesScreen() {
   async function handleCancelar() {
     if (!confirmId) return;
 
+    console.log("Confirmando cancelamento da solicitação com ID:", confirmId);
+
     try {
-      await cancelarSolicitacao(confirmId);
+      const solicitacao = solicitacoes.find(
+        (s) => s.idSolicitacao === confirmId,
+      );
+
+      if (!solicitacao) {
+        throw new Error("Solicitação não encontrada.");
+      }
+
+      await deleteSolicitacaoVinculo(
+        solicitacao.idFicha,
+        solicitacao.idSolicitacao,
+      );
 
       setSolicitacoes((prev) =>
         prev.filter((s) => s.idSolicitacao !== confirmId),
       );
 
       setConfirmId(null);
+
+      Alert.alert("Sucesso", "Solicitação de vínculo removida.");
     } catch {
       Alert.alert("Erro", "Não foi possível cancelar a solicitação.");
     }

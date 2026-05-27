@@ -6,7 +6,6 @@ export async function solicitarAlteracaoPsicologo(
   dados: { idPaciente: string; idFicha: string },
 ) {
   try {
-    console.log("Criando solicitação de vínculo para paciente:", dados.idFicha);
     const alteracaoRef = collection(
       db,
       "fichaAtendimento",
@@ -19,8 +18,6 @@ export async function solicitarAlteracaoPsicologo(
       idNovoPsicologo: idNovoPsicologo,
       dataCriacao: serverTimestamp(), // Boa prática para ordenar depois
     });
-
-    console.log("Solicitação de vínculo criada com sucesso!");
   } catch (error) {
     console.error("Erro ao criar solicitação de alteração:", error);
     throw error;

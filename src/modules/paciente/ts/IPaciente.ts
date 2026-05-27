@@ -10,7 +10,6 @@ export interface IPaciente {
 }
 
 export interface IPacienteComSolicitacao extends IPaciente {
-  idFichaAtendimento: string;
   idSolicitacao: string;
   dataSolicitacao: string;
 }
