@@ -1,4 +1,4 @@
-import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
+import { IPaciente } from "@/src/modules/paciente/ts/IPaciente";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRef } from "react";
@@ -7,7 +7,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 export type { ActionPosition };
 
 interface Props extends Pick<
-  IDadosPaciente,
+  IPaciente,
   "nome" | "email" | "contato" | "nascimento"
 > {
   onActions: (position: ActionPosition) => void;
@@ -55,14 +55,18 @@ export function CardPaciente({
         <Text className="font-bold">E-mail: </Text>
         {email}
       </Text>
-      <Text className="text-sm text-grey-800">
-        <Text className="font-bold">Contato: </Text>
-        {contato}
-      </Text>
-      <Text className="text-sm text-grey-800">
-        <Text className="font-bold">Data de Nascimento: </Text>
-        {nascimento}
-      </Text>
+      {contato && (
+        <Text className="text-sm text-grey-800">
+          <Text className="font-bold">Contato: </Text>
+          {contato}
+        </Text>
+      )}
+      {nascimento && (
+        <Text className="text-sm text-grey-800">
+          <Text className="font-bold">Data de Nascimento: </Text>
+          {nascimento}
+        </Text>
+      )}
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
+import { IPaciente } from "@/src/modules/paciente/ts/IPaciente";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -10,7 +10,7 @@ interface Action {
   disabled?: boolean;
 }
 
-interface Props extends Pick<IDadosPaciente, "nome" | "email" | "contato"> {
+interface Props extends Pick<IPaciente, "nome" | "email" | "contato"> {
   action: Action;
 }
 

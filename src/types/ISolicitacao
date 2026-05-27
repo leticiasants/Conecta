@@ -1,0 +1,6 @@
+export interface ISolicitacao {
+  id: string;
+  idFichaAtendimento: string;
+  idNovoPsicologo: string;
+  dataCriacao: any;
+}

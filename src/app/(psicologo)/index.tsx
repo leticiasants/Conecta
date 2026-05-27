@@ -1,11 +1,14 @@
-import { View, Text, Image } from "react-native";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { Image, Text, View } from "react-native";
 
 export default function HomeScreen() {
+  const { user, userProfile } = useAuth();
+
   return (
     <View className="flex-1 items-center justify-center bg-white gap-12">
       <View className="justify-center items-center gap-5 px-7">
         <Text className="text-primary text-2xl font-bold">
-          Bem-vindo(a), João da Silva!
+          Bem-vindo(a), {userProfile?.nome}!
         </Text>
         <Text className="text-center text-grey-800 font-primary">
           Aqui você pode acompanhar de perto o progresso dos seus pacientes. Use

@@ -1,30 +1,42 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalEditarDados } from "@/src/modules/psicologo/components";
-import { router } from "expo-router";
-
-const MOCK_DADOS = {
-  id: "1",
-  nome: "Letícia Vitória dos Santos",
-  email: "leticia@gmail.com",
-  crp: "01/12345",
-  contato: "(35) 99999-9999",
-};
+import { deleteAccountPsicologo } from "@/src/services/authService";
 
 export default function MeusDadosScreen() {
-  const [dados] = useState(MOCK_DADOS);
+  const { user, userProfile, signOut } = useAuth();
   const [editarVisible, setEditarVisible] = useState(false);
   const [senhaVisible, setSenhaVisible] = useState(false);
   const [excluirVisible, setExcluirVisible] = useState(false);
 
-  function handleExcluirConta() {
-    // TODO: integrar com API
-    router.replace("/login");
+  const psicologo = userProfile;
+
+  async function handleExcluirConta() {
+    if (!user) return;
+    try {
+      await deleteAccountPsicologo(user.uid);
+      router.replace("/login");
+    } catch (err: any) {
+      if (err.code === "auth/requires-recent-login") {
+        Alert.alert(
+          "Atenção",
+          "Por segurança, faça login novamente antes de excluir a conta.",
+        );
+        await signOut();
+        router.replace("/login");
+      } else {
+        Alert.alert("Erro", "Não foi possível excluir a conta.");
+      }
+    }
   }
+
+  if (!psicologo) return null;
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -57,10 +69,10 @@ export default function MeusDadosScreen() {
             shadowRadius: 3,
           }}
         >
-          <DataRow label="Nome" value={dados.nome} />
-          <DataRow label="E-mail" value={dados.email} />
-          <DataRow label="CRP" value={dados.crp} />
-          <DataRow label="Contato" value={dados.contato} last />
+          <DataRow label="Nome" value={psicologo.nome} />
+          <DataRow label="E-mail" value={psicologo.email} />
+          <DataRow label="CRP" value={psicologo.crp ?? "—"} />
+          <DataRow label="Contato" value={psicologo.contato ?? "—"} last />
         </View>
 
         <TouchableOpacity
@@ -111,7 +123,13 @@ export default function MeusDadosScreen() {
       <ModalEditarDados
         visible={editarVisible}
         onClose={() => setEditarVisible(false)}
-        initialData={dados}
+        initialData={{
+          id: psicologo.id,
+          nome: psicologo.nome,
+          email: psicologo.email,
+          crp: psicologo.crp ?? "",
+          contato: psicologo.contato,
+        }}
       />
 
       <AlterarSenhaModal
@@ -121,9 +139,7 @@ export default function MeusDadosScreen() {
 
       <ConfirmModal
         visible={excluirVisible}
-        message={
-          "Tem certeza de que deseja excluir sua conta? Esta ação é permanente e não poderá ser desfeita. Ao continuar, você perderá o vínculo com todos os seus pacientes atuais."
-        }
+        message="Tem certeza de que deseja excluir sua conta? Esta ação é permanente e não poderá ser desfeita. Ao continuar, você perderá o vínculo com todos os seus pacientes atuais."
         onClose={() => setExcluirVisible(false)}
         onConfirm={handleExcluirConta}
       />
@@ -134,12 +150,10 @@ export default function MeusDadosScreen() {
 function DataRow({
   label,
   value,
-  underline,
   last,
 }: {
   label: string;
   value: string;
-  underline?: boolean;
   last?: boolean;
 }) {
   return (

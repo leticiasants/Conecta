@@ -1,7 +1,10 @@
+import { EMAIL_PATTERN } from "@/src/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Text,
@@ -9,14 +12,41 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { login } from "../modules/auth/services/login";
+
+type FormData = { email: string; senha: string };
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <Text className="text-red-300 text-xs mt-1 mb-2">{message}</Text>;
+}
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  function handleLogin() {
-    router.replace("/(psicologo)");
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({ defaultValues: { email: "", senha: "" } });
+
+  async function onSubmit(data: FormData) {
+    try {
+      const res = await login({ email: data.email, senha: data.senha });
+
+      const usuario = res.usuario;
+
+      if (usuario?.tipo === "PACIENTE") {
+        router.replace("/(paciente)");
+      } else if (usuario?.tipo === "PSICOLOGO") {
+        router.replace("/(psicologo)");
+      } else {
+        router.replace("/login");
+      }
+    } catch (err: any) {
+      setError("root", { message: err.message });
+    }
   }
 
   return (
@@ -47,51 +77,84 @@ export default function LoginScreen() {
             Login
           </Text>
 
-          <View>
+          <View className="mb-2">
             <Text className="text-white font-primary-medium text-sm mb-1">
               E-mail
             </Text>
-            <TextInput
-              className="border border-secondary bg-white rounded-lg px-4 py-3 mb-4 text-base text-secondary"
-              placeholder="exemplo@mail.com"
-              placeholderTextColor="#97BFAB"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="email"
+              rules={{
+                required: "E-mail é obrigatório",
+                pattern: EMAIL_PATTERN,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  className="border border-secondary bg-white rounded-lg px-4 py-3 text-base text-secondary"
+                  placeholder="exemplo@mail.com"
+                  placeholderTextColor="#97BFAB"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              )}
             />
+            <FieldError message={errors.email?.message} />
           </View>
 
-          <View>
+          <View className="mb-2">
             <Text className="text-white font-primary-medium text-sm mb-1">
               Senha
             </Text>
-            <View className="border bg-white border-secondary  rounded-lg flex-row items-center px-4 mb-6">
-              <TextInput
-                className="flex-1 py-3 text-base text-secondary"
-                placeholder="••••••••"
-                placeholderTextColor="#97BFAB"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <MaterialIcons
-                  name={showPassword ? "visibility" : "visibility-off"}
-                  size={24}
-                  color="#97BFAB"
-                />
-              </TouchableOpacity>
-            </View>
+            <Controller
+              control={control}
+              name="senha"
+              rules={{ required: "Senha é obrigatória" }}
+              render={({ field: { onChange, value } }) => (
+                <View className="border bg-white border-secondary rounded-lg flex-row items-center px-4">
+                  <TextInput
+                    className="flex-1 py-3 text-base text-secondary"
+                    placeholder="••••••••"
+                    placeholderTextColor="#97BFAB"
+                    value={value}
+                    onChangeText={onChange}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <MaterialIcons
+                      name={showPassword ? "visibility" : "visibility-off"}
+                      size={24}
+                      color="#97BFAB"
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <FieldError message={errors.senha?.message} />
           </View>
 
-          <View className="gap-1 items-center">
+          {errors.root && (
+            <Text className="text-red-300 text-sm text-center mb-4">
+              {errors.root.message}
+            </Text>
+          )}
+
+          <View className="gap-1 items-center mt-4">
             <TouchableOpacity
               className="bg-secondary w-full rounded-lg py-3 items-center"
-              onPress={handleLogin}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
             >
-              <Text className="text-white font-semibold text-base">Entrar</Text>
+              {isSubmitting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white font-semibold text-base">
+                  Entrar
+                </Text>
+              )}
             </TouchableOpacity>
             <Text className="text-xs text-white text-nowrap">
               É psicólogo(a) e não tem uma conta?{" "}

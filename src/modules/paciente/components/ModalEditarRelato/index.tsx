@@ -11,20 +11,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IRelato } from "../../ts/IRelato";
+import { IRelato } from "../../ts/IRegistro";
+import { formatDate } from "@/src/utils/formatters";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
   initialData?: IRelato;
   onSave: (data: IRelato) => void;
-}
-
-function formatDate(value: string): string {
-  const d = value.replace(/\D/g, "").slice(0, 8);
-  if (d.length <= 2) return d;
-  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
-  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
 }
 
 function Field({

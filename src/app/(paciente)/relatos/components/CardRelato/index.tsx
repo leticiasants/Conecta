@@ -1,10 +1,10 @@
-import { IRelato } from "@/src/modules/paciente/ts/IRelato";
+import { IRegistro } from "@/src/modules/paciente/ts/IRegistro";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-interface Props extends IRelato {
+interface Props extends IRegistro {
   acoes?: (position: ActionPosition) => void;
 }
 

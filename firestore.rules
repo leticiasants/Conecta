@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    // ── Usuários ─────────────────────────────────────────────────────────────
+    // Qualquer autenticado lê; o próprio usuário (via idAuth) atualiza/deleta.
+    // Create é aberto a qualquer autenticado pois o psicólogo cria o perfil
+    // do paciente com um app secundário do Firebase.
+
+    match /usuario/{id} {
+      allow read: if autenticado();
+      allow create: if autenticado();
+      allow update, delete: if autenticado() && request.auth.uid == resource.data.idAuth;
+    }
+
+    // ── Fichas de Atendimento ────────────────────────────────────────────────
+    // idPaciente e idPsicologo são IDs de documentos Firestore (não Auth UIDs),
+    // por isso a verificação fina de "dono" exigiria get() de lookup.
+    // TODO: migrar fichaAtendimento para armazenar Auth UIDs e usar checks precisos.
+
+    match /fichaAtendimento/{fichaId} {
+      allow read, create: if autenticado();
+      allow update: if autenticado();
+      allow delete: if false;
+
+      // ── Registros (subcoleção) ───────────────────────────────────────────
+      match /registro/{registroId} {
+        allow read: if autenticado();
+        allow create, update, delete: if autenticado();
+      }
+
+      // ── Alteração de Psicólogo (subcoleção) ─────────────────────────────
+      match /alteracaoPsicologo/{altId} {
+        allow read, create: if autenticado();
+      }
+    }
+
+    // ── Solicitações de Vínculo ──────────────────────────────────────────────
+    // NOTA: o código atual usa fichaAtendimento/{id}/alteracaoPsicologo.
+    // Esta coleção está mantida para uso futuro.
+
+    match /alteracaoPsicologo/{solId} {
+      allow read: if autenticado() && (
+        request.auth.uid == resource.data.idPaciente ||
+        request.auth.uid == resource.data.idPsicologo
+      );
+      allow create: if autenticado() &&
+        request.auth.uid == request.resource.data.idPsicologo;
+      allow update: if autenticado() && (
+        request.auth.uid == resource.data.idPsicologo ||
+        request.auth.uid == resource.data.idPaciente
+      );
+      allow delete: if false;
+    }
+  }
+}

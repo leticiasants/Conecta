@@ -1,57 +1,51 @@
 import { ConfirmModal } from "@/src/components/ConfirmModal";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
-
-import { CardSolicitacao } from "./components/CardSolicitacao";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAceitarVinculo } from "@/src/modules/paciente/components";
-
-type Solicitacao = {
-  id: string;
-  nome: string;
-  email: string;
-  crp: string;
-};
-
-const MOCK_SOLICITACOES: Solicitacao[] = [
-  {
-    id: "1",
-    nome: "Dra. Ana Souza",
-    email: "ana.souza@clinica.com",
-    crp: "06/78901",
-  },
-  {
-    id: "2",
-    nome: "Dr. Carlos Lima",
-    email: "carlos.lima@psi.com",
-    crp: "04/23456",
-  },
-];
+import {
+  aceitar,
+  ISolicitacao,
+  listarParaPaciente,
+  recusar,
+} from "@/src/services/solicitacaoService";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Text, View } from "react-native";
+import { CardSolicitacao } from "./components/CardSolicitacao";
 
 export default function SolicitacoesScreen() {
-  const [solicitacoes, setSolicitacoes] =
-    useState<Solicitacao[]>(MOCK_SOLICITACOES);
+  const { user } = useAuth();
+  const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
   const [recusarId, setRecusarId] = useState<string | null>(null);
-  const [aceitarId, setAceitarId] = useState<string | null>(null);
+  const [aceitarItem, setAceitarItem] = useState<ISolicitacao | null>(null);
 
-  function handleRecusar() {
+  const carregar = useCallback(async () => {
+    if (!user) return;
+    const data = await listarParaPaciente(user.uid);
+    setSolicitacoes(data);
+  }, [user]);
+
+  useEffect(() => { carregar(); }, [carregar]);
+
+  async function handleRecusar() {
     if (!recusarId) return;
-    setSolicitacoes((prev) => prev.filter((s) => s.id !== recusarId));
-    setRecusarId(null);
+    try {
+      await recusar(recusarId);
+      setSolicitacoes((prev) => prev.filter((s) => s.id !== recusarId));
+      setRecusarId(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível recusar a solicitação.");
+    }
   }
 
-  function handleIniciarNovaFicha() {
-    // TODO: integrar com API — aceitar vínculo com nova ficha
-    if (!aceitarId) return;
-    setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarId));
-    setAceitarId(null);
-  }
-
-  function handleCompartilharRegistros() {
-    // TODO: integrar com API — aceitar vínculo compartilhando registros
-    if (!aceitarId) return;
-    setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarId));
-    setAceitarId(null);
+  async function handleAceitar() {
+    if (!aceitarItem || !user) return;
+    try {
+      await aceitar(aceitarItem.id, user.uid, aceitarItem.id_psicologo);
+      setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarItem.id));
+      setAceitarItem(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível aceitar a solicitação.");
+    }
   }
 
   const recusarItem = solicitacoes.find((s) => s.id === recusarId);
@@ -74,21 +68,16 @@ export default function SolicitacoesScreen() {
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardSolicitacao
-            nome={item.nome}
-            email={item.email}
-            crp={item.crp}
+            nome={item.nome_psicologo}
+            email={item.email_psicologo}
+            crp={item.crp_psicologo}
             onRecusar={() => setRecusarId(item.id)}
-            onAceitar={() => setAceitarId(item.id)}
+            onAceitar={() => setAceitarItem(item)}
           />
         )}
         ListEmptyComponent={
           <View className="items-center justify-center py-32 gap-2">
-            <MaterialIcons
-              name="search-off"
-              size={40}
-              color="#828282"
-              className="mt-0.5 ml-1"
-            />
+            <MaterialIcons name="search-off" size={40} color="#828282" />
             <Text className="text-grey-500 text-sm">
               Nenhuma solicitação pendente.
             </Text>
@@ -98,17 +87,17 @@ export default function SolicitacoesScreen() {
 
       <ConfirmModal
         visible={!!recusarId}
-        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nome ?? "este profissional"}?`}
+        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nome_psicologo ?? "este profissional"}?`}
         confirmLabel="Recusar"
         onClose={() => setRecusarId(null)}
         onConfirm={handleRecusar}
       />
 
       <ModalAceitarVinculo
-        visible={!!aceitarId}
-        onClose={() => setAceitarId(null)}
-        onIniciarNovaFicha={handleIniciarNovaFicha}
-        onCompartilharRegistros={handleCompartilharRegistros}
+        visible={!!aceitarItem}
+        onClose={() => setAceitarItem(null)}
+        onIniciarNovaFicha={handleAceitar}
+        onCompartilharRegistros={handleAceitar}
       />
     </View>
   );

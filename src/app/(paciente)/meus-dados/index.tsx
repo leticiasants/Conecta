@@ -1,31 +1,41 @@
 import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalEditarDados } from "@/src/modules/paciente/components";
+import { deleteAccountPaciente } from "@/src/services/authService";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-
-const MOCK_DADOS = {
-  id: "1",
-  nome: "Maria Silva",
-  email: "maria.silva@gmail.com",
-  cpf: "123.456.789-00",
-  contato: "(35) 99999-9999",
-  contatoEmergencia: "(35) 98888-8888",
-  nascimento: "12/04/1995",
-};
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function MeusDadosScreen() {
-  const [dados] = useState(MOCK_DADOS);
+  const { user, userProfile, signOut } = useAuth();
   const [editarVisible, setEditarVisible] = useState(false);
   const [senhaVisible, setSenhaVisible] = useState(false);
   const [excluirVisible, setExcluirVisible] = useState(false);
 
-  function handleExcluirConta() {
-    // TODO: integrar com API
-    router.replace("/login");
+  const paciente = userProfile;
+
+  async function handleExcluirConta() {
+    if (!user) return;
+    try {
+      await deleteAccountPaciente(user.uid);
+      router.replace("/login");
+    } catch (err: any) {
+      if (err.code === "auth/requires-recent-login") {
+        Alert.alert(
+          "Atenção",
+          "Por segurança, faça login novamente antes de excluir a conta.",
+        );
+        await signOut();
+        router.replace("/login");
+      } else {
+        Alert.alert("Erro", "Não foi possível excluir a conta.");
+      }
+    }
   }
+
+  if (!paciente) return null;
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -62,14 +72,17 @@ export default function MeusDadosScreen() {
             shadowRadius: 3,
           }}
         >
-          <DataRow label="Nome" value={dados.nome} />
-          <DataRow label="E-mail" value={dados.email} underline />
-          <DataRow label="CPF" value={dados.cpf} />
-          <DataRow label="Data de Nascimento" value={dados.nascimento} />
-          <DataRow label="Contato" value={dados.contato} />
+          <DataRow label="Nome" value={paciente.nome} />
+          <DataRow label="E-mail" value={paciente.email} underline />
+          <DataRow label="CPF" value={paciente.cpf ?? "—"} />
+          <DataRow
+            label="Data de Nascimento"
+            value={paciente.dataNasc ?? "—"}
+          />
+          <DataRow label="Contato" value={paciente.contato ?? "—"} />
           <DataRow
             label="Contato de emergência"
-            value={dados.contatoEmergencia}
+            value={paciente.contatoEmerg ?? "—"}
             last
           />
         </View>
@@ -122,7 +135,15 @@ export default function MeusDadosScreen() {
       <ModalEditarDados
         visible={editarVisible}
         onClose={() => setEditarVisible(false)}
-        initialData={dados}
+        initialData={{
+          id: paciente.id,
+          nome: paciente.nome,
+          email: paciente.email,
+          cpf: paciente.cpf ?? "",
+          contato: paciente.contato,
+          contatoEmergencia: paciente.contatoEmerg,
+          nascimento: paciente.dataNasc,
+        }}
       />
 
       <AlterarSenhaModal

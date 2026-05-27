@@ -1,60 +1,56 @@
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
-import { IDadosPaciente } from "@/src/modules/paciente/ts/IDadosPaciente";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { IPacienteComSolicitacao } from "@/src/modules/paciente/ts/IPaciente";
+import { getAllSolicitacaoVinculo } from "@/src/modules/psicologo/services/get-all-solicitacao-vinculo";
+import { cancelarSolicitacao } from "@/src/services/solicitacaoService";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Text, View } from "react-native";
 import { CardVinculo } from "./components/CardVinculo";
-
-interface VinculoPendente extends Pick<
-  IDadosPaciente,
-  "id" | "nome" | "email" | "contato"
-> {}
-
-const MOCK_VINCULOS: VinculoPendente[] = [
-  {
-    id: "1",
-    nome: "Thiago Terra Silva",
-    email: "thiago.terra.silva@hotmail.com",
-    contato: "(35) 99999-9999",
-  },
-  {
-    id: "2",
-    nome: "Beatriz Ramos Costa",
-    email: "beatriz.ramos@gmail.com",
-    contato: "(11) 98888-8888",
-  },
-  {
-    id: "3",
-    nome: "Lucas Fernandes Rocha",
-    email: "lucas.fernandes@gmail.com",
-    contato: "(21) 97777-7777",
-  },
-  {
-    id: "4",
-    nome: "Camila Souza Almeida",
-    email: "camila.souza@gmail.com",
-    contato: "(31) 96666-6666",
-  },
-];
 
 const ITEMS_PER_PAGE = 4;
 
 export default function VinculosPendentesScreen() {
+  const { userProfile } = useAuth();
+
+  const [solicitacoes, setSolicitacoes] = useState<IPacienteComSolicitacao[]>(
+    [],
+  );
+
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [confirmId, setConfirmId] = useState<string | null>(null);
-  const [vinculos, setVinculos] = useState(MOCK_VINCULOS);
 
-  const filtered = vinculos.filter(
-    (v) =>
-      v.nome.toLowerCase().includes(search.toLowerCase()) ||
-      v.email.toLowerCase().includes(search.toLowerCase()) ||
-      v.contato?.includes(search),
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  const carregar = useCallback(async () => {
+    if (!userProfile) return;
+
+    try {
+      const data = await getAllSolicitacaoVinculo(userProfile.id);
+
+      setSolicitacoes(data);
+    } catch (error) {
+      console.error(error);
+
+      Alert.alert("Erro", "Não foi possível carregar solicitações.");
+    }
+  }, [userProfile]);
+
+  useEffect(() => {
+    carregar();
+  }, [carregar]);
+
+  const filtered = solicitacoes.filter(
+    (s) =>
+      s.nome.toLowerCase().includes(search.toLowerCase()) ||
+      s.email.toLowerCase().includes(search.toLowerCase()) ||
+      s.contato?.includes(search),
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+
   const pageData = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
@@ -65,18 +61,30 @@ export default function VinculosPendentesScreen() {
     setCurrentPage(1);
   }
 
-  function handleRemover() {
+  async function handleCancelar() {
     if (!confirmId) return;
-    setVinculos((prev) => prev.filter((v) => v.id !== confirmId));
+
+    try {
+      await cancelarSolicitacao(confirmId);
+
+      setSolicitacoes((prev) =>
+        prev.filter((s) => s.idSolicitacao !== confirmId),
+      );
+
+      setConfirmId(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível cancelar a solicitação.");
+    }
   }
 
   return (
     <View className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
-        <Text className="text-2xl font-bold text-primary mb-1">
+        <Text className="mb-1 text-2xl font-bold text-primary">
           Vínculos Pendentes
         </Text>
-        <Text className="text-sm text-grey-500 mb-4">
+
+        <Text className="mb-4 text-sm text-grey-500">
           Acompanhe as suas solicitações de vínculo.
         </Text>
 
@@ -89,9 +97,12 @@ export default function VinculosPendentesScreen() {
 
       <FlatList
         data={pageData}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.idSolicitacao}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
+        contentContainerStyle={{
+          paddingTop: 8,
+          paddingBottom: 8,
+        }}
         renderItem={({ item }) => (
           <CardVinculo
             nome={item.nome}
@@ -101,19 +112,15 @@ export default function VinculosPendentesScreen() {
               label: "Remover solicitação",
               icon: "person-remove",
               variant: "outlined",
-              onPress: () => setConfirmId(item.id),
+              onPress: () => setConfirmId(item.idSolicitacao),
             }}
           />
         )}
         ListEmptyComponent={
-          <View className="items-center justify-center py-32 gap-2">
-            <MaterialIcons
-              name="search-off"
-              size={40}
-              color="#828282"
-              className="mt-0.5 ml-1"
-            />
-            <Text className="text-grey-500 text-sm">
+          <View className="items-center justify-center gap-2 py-32">
+            <MaterialIcons name="search-off" size={40} color="#828282" />
+
+            <Text className="text-sm text-grey-500">
               Nenhuma solicitação pendente.
             </Text>
           </View>
@@ -130,7 +137,7 @@ export default function VinculosPendentesScreen() {
         visible={confirmId !== null}
         message="Tem certeza de que deseja remover a solicitação de vínculo?"
         onClose={() => setConfirmId(null)}
-        onConfirm={handleRemover}
+        onConfirm={handleCancelar}
       />
     </View>
   );

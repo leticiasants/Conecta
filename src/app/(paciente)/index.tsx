@@ -1,11 +1,14 @@
+import { useAuth } from "@/src/contexts/AuthContext";
 import { Image, Text, View } from "react-native";
 
 export default function HomePacienteScreen() {
+  const { userProfile } = useAuth();
+
   return (
     <View className="flex-1 items-center justify-center bg-white gap-12">
       <View className="justify-center items-center gap-5 px-7">
         <Text className="text-primary text-2xl font-bold">
-          Bem-vindo(a), Maria Silva!
+          Bem-vindo(a), {userProfile?.nome}!
         </Text>
         <Text className="text-center text-grey-800 font-primary">
           Registrar o que você sente ao longo da semana é um passo importante

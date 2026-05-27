@@ -2,56 +2,33 @@ import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAddRelato } from "@/src/modules/paciente/components";
 import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
-import { IRelato } from "@/src/modules/paciente/ts/IRelato";
+import { IRelato } from "@/src/modules/paciente/ts/IRegistro";
+import { getFichaDoPaciente } from "@/src/services/fichaAtendimentoService";
+import {
+  atualizarRegistro,
+  criarRegistro,
+  deletarRegistro,
+  listarRegistros,
+} from "@/src/services/registroService";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { CardRelato } from "./components";
 
 type Relato = IRelato & { id: string };
 
-const MOCK_RELATOS: Relato[] = [
-  {
-    id: "1",
-    situacao: "Fiquei triste",
-    emocao: "Tristeza",
-    intensidade: 6,
-    descricao:
-      "Hoje foi um dia difícil. Senti que as coisas não estavam fluindo e me fechei um pouco. Precisei de um tempo sozinha para processar os sentimentos.",
-    dataOcorrido: "16/02/2026",
-  },
-  {
-    id: "2",
-    situacao: "Dia feliz",
-    emocao: "Alegria",
-    intensidade: 8,
-    descricao:
-      "Hoje foi um dia leve e feliz. Consegui realizar minhas tarefas com tranquilidade e ainda tive alguns momentos agradáveis ao longo do dia.",
-    dataOcorrido: "17/02/2026",
-  },
-  {
-    id: "3",
-    situacao: "Ansiedade no trabalho",
-    emocao: "Ansiedade",
-    intensidade: 7,
-    descricao:
-      "Tive muitas demandas hoje e me senti sobrecarregada. As reuniões foram longas e não consegui finalizar as tarefas planejadas.",
-    dataOcorrido: "18/02/2026",
-  },
-];
-
-// const MOCK_RELATOS: Relato[] = [];
-
 const ITEMS_PER_PAGE = 3;
-
 type ActionsState = { relatoId: string; position: ActionPosition };
 
 export default function RelatosScreen() {
-  const [relatos, setRelatos] = useState<Relato[]>(MOCK_RELATOS);
+  const { user } = useAuth();
+  const [fichaId, setFichaId] = useState<string | null>(null);
+  const [relatos, setRelatos] = useState<Relato[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [addVisible, setAddVisible] = useState(false);
@@ -68,7 +45,21 @@ export default function RelatosScreen() {
     }
   }, [openAdd]);
 
-  const nextId = useRef(MOCK_RELATOS.length + 1);
+  const carregarRelatos = useCallback(async () => {
+    if (!user) return;
+    const ficha = await getFichaDoPaciente(user.uid);
+    if (!ficha) {
+      setFichaId(null);
+      return;
+    }
+    setFichaId(ficha.fichaId);
+    const data = await listarRegistros(ficha.fichaId);
+    setRelatos(data);
+  }, [user]);
+
+  useEffect(() => {
+    carregarRelatos();
+  }, [carregarRelatos]);
 
   const filtered = relatos.filter(
     (r) =>
@@ -88,25 +79,40 @@ export default function RelatosScreen() {
     setCurrentPage(1);
   }
 
-  function handleAdd(data: IRelato) {
-    const newRelato: Relato = { ...data, id: String(nextId.current++) };
-    setRelatos((prev) => [newRelato, ...prev]);
+  async function handleAdd(data: IRelato) {
+    if (!fichaId) return;
+    try {
+      await criarRegistro(fichaId, data);
+      await carregarRelatos();
+    } catch {
+      Alert.alert("Erro", "Não foi possível salvar o relato.");
+    }
   }
 
-  function handleEdit(data: IRelato) {
-    if (!editData) return;
-    setRelatos((prev) =>
-      prev.map((r) =>
-        r.id === editData.id ? { ...data, id: editData.id } : r,
-      ),
-    );
-    setEditData(null);
+  async function handleEdit(data: IRelato) {
+    if (!fichaId || !editData) return;
+    try {
+      await atualizarRegistro(fichaId, editData.id, data);
+      setRelatos((prev) =>
+        prev.map((r) =>
+          r.id === editData.id ? { ...data, id: editData.id } : r,
+        ),
+      );
+      setEditData(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível editar o relato.");
+    }
   }
 
-  function handleDelete() {
-    if (!confirmId) return;
-    setRelatos((prev) => prev.filter((r) => r.id !== confirmId));
-    setConfirmId(null);
+  async function handleDelete() {
+    if (!fichaId || !confirmId) return;
+    try {
+      await deletarRegistro(fichaId, confirmId);
+      setRelatos((prev) => prev.filter((r) => r.id !== confirmId));
+      setConfirmId(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível excluir o relato.");
+    }
   }
 
   function openActions(relatoId: string, position: ActionPosition) {
@@ -131,6 +137,7 @@ export default function RelatosScreen() {
           </View>
           <TouchableOpacity
             onPress={() => setAddVisible(true)}
+            disabled={!fichaId}
             className="w-11 h-11 rounded-full bg-primary items-center justify-center"
           >
             <MaterialIcons
@@ -166,14 +173,11 @@ export default function RelatosScreen() {
         )}
         ListEmptyComponent={
           <View className="items-center justify-center py-32 gap-2">
-            <MaterialIcons
-              name="search-off"
-              size={40}
-              color="#828282"
-              className="mt-0.5 ml-1"
-            />
+            <MaterialIcons name="search-off" size={40} color="#828282" />
             <Text className="text-grey-500 text-sm">
-              Infelizmente nenhum relato encontrado.
+              {fichaId === null
+                ? "Você não possui vínculo ativo com um psicólogo."
+                : "Infelizmente nenhum relato encontrado."}
             </Text>
           </View>
         }

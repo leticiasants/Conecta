@@ -1,29 +1,41 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
   Modal,
-  View,
+  Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from "react-native";
-import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { updateSenha } from "../modules/auth/services/update-senha";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
 }
 
+type FormData = {
+  oldPassword: string;
+  newPassword: string;
+  repeatPassword: string;
+};
+
 function PasswordField({
   label,
   value,
   onChange,
+  error,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  error?: string;
 }) {
   const [show, setShow] = useState(false);
   return (
@@ -48,21 +60,35 @@ function PasswordField({
           />
         </TouchableOpacity>
       </View>
+      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
     </View>
   );
 }
 
 export function AlterarSenhaModal({ visible, onClose }: Props) {
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    defaultValues: { oldPassword: "", newPassword: "", repeatPassword: "" },
+  });
 
-  function handleSave() {
-    // TODO: integrar com API
-    setOldPassword("");
-    setNewPassword("");
-    setRepeatPassword("");
+  function handleClose() {
+    reset();
     onClose();
+  }
+
+  async function onSubmit(data: FormData) {
+    try {
+      await updateSenha(data.oldPassword, data.newPassword);
+      Alert.alert("Sucesso", "Senha alterada com sucesso.");
+      handleClose();
+    } catch (err: any) {
+      Alert.alert("Erro", err.message);
+    }
   }
 
   return (
@@ -70,7 +96,7 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View className="flex-1 bg-black/40 justify-center items-center px-5">
         <KeyboardAvoidingView
@@ -79,11 +105,17 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
         >
           <View className="bg-white rounded-3xl w-full">
             <ScrollView
-              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+              contentContainerStyle={{
+                paddingHorizontal: 24,
+                paddingBottom: 40,
+              }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
-              <TouchableOpacity onPress={onClose} className="self-end pt-4 pb-2">
+              <TouchableOpacity
+                onPress={handleClose}
+                className="self-end pt-4 pb-2"
+              >
                 <MaterialIcons name="close" size={24} color="#3D3D3D" />
               </TouchableOpacity>
 
@@ -96,27 +128,65 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
                 anteriormente.
               </Text>
 
-              <PasswordField
-                label="Senha antiga"
-                value={oldPassword}
-                onChange={setOldPassword}
+              <Controller
+                control={control}
+                name="oldPassword"
+                rules={{ required: "Senha antiga é obrigatória" }}
+                render={({ field: { onChange, value } }) => (
+                  <PasswordField
+                    label="Senha antiga"
+                    value={value}
+                    onChange={onChange}
+                    error={errors.oldPassword?.message}
+                  />
+                )}
               />
-              <PasswordField
-                label="Nova senha"
-                value={newPassword}
-                onChange={setNewPassword}
+
+              <Controller
+                control={control}
+                name="newPassword"
+                rules={{
+                  required: "Nova senha é obrigatória",
+                  minLength: { value: 6, message: "Mínimo 6 caracteres" },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <PasswordField
+                    label="Nova senha"
+                    value={value}
+                    onChange={onChange}
+                    error={errors.newPassword?.message}
+                  />
+                )}
               />
-              <PasswordField
-                label="Repetir senha"
-                value={repeatPassword}
-                onChange={setRepeatPassword}
+
+              <Controller
+                control={control}
+                name="repeatPassword"
+                rules={{
+                  required: "Confirmação obrigatória",
+                  validate: (v) =>
+                    v === watch("newPassword") || "As senhas não coincidem",
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <PasswordField
+                    label="Repetir senha"
+                    value={value}
+                    onChange={onChange}
+                    error={errors.repeatPassword?.message}
+                  />
+                )}
               />
 
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
-                onPress={handleSave}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
               >
-                <Text className="text-white font-bold text-base">Salvar</Text>
+                {isSubmitting ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-white font-bold text-base">Salvar</Text>
+                )}
               </TouchableOpacity>
             </ScrollView>
           </View>

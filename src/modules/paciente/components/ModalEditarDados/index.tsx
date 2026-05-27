@@ -1,6 +1,19 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useAuth } from "@/src/contexts/AuthContext";
+
+import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
+import { formatCPF, formatContato, formatDate } from "@/src/utils/formatters";
 import {
+  EMAIL_PATTERN,
+  validarCPF,
+  validarData,
+  validarTelefone,
+} from "@/src/utils/validations";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,62 +23,76 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IDadosPaciente } from "../../ts/IDadosPaciente";
+import { IPaciente } from "../../ts/IPaciente";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: IDadosPaciente;
+  initialData?: IPaciente;
 }
 
-function formatCPF(value: string): string {
-  const d = value.replace(/\D/g, "").slice(0, 11);
-  if (d.length <= 3) return d;
-  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
-  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
-  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
-}
+type FormData = {
+  nome: string;
+  email: string;
+  cpf: string;
+  contato: string;
+  contatoEmergencia: string;
+  nascimento: string;
+};
 
-function formatDate(value: string): string {
-  const d = value.replace(/\D/g, "").slice(0, 8);
-  if (d.length <= 2) return d;
-  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
-  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
-}
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <View className="mb-5">
-      <Text className="text-grey-800 text-sm mb-1">
-        {label}
-        {required && <Text className="text-primary"> *</Text>}
-      </Text>
-      {children}
-    </View>
-  );
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <Text className="text-red-500 text-xs mt-1">{message}</Text>;
 }
 
 export function ModalEditarDados({ visible, onClose, initialData }: Props) {
-  const [name, setName] = useState(initialData?.nome ?? "");
-  const [email, setEmail] = useState(initialData?.email ?? "");
-  const [cpf, setCpf] = useState(initialData?.cpf ?? "");
-  const [phone, setPhone] = useState(initialData?.contato ?? "");
-  const [emergencyPhone, setEmergencyPhone] = useState(
-    initialData?.contatoEmergencia ?? "",
-  );
-  const [birthDate, setBirthDate] = useState(initialData?.nascimento ?? "");
+  const { userProfile, refreshUserProfile } = useAuth();
 
-  function handleSave() {
-    // TODO: integrar com API
-    onClose();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    defaultValues: {
+      nome: initialData?.nome ?? "",
+      email: initialData?.email ?? "",
+      cpf: initialData?.cpf ?? "",
+      contato: initialData?.contato ?? "",
+      contatoEmergencia: initialData?.contatoEmergencia ?? "",
+      nascimento: initialData?.nascimento ?? "",
+    },
+  });
+
+  useEffect(() => {
+    if (visible) {
+      reset({
+        nome: initialData?.nome ?? "",
+        email: initialData?.email ?? "",
+        cpf: initialData?.cpf ?? "",
+        contato: initialData?.contato ?? "",
+        contatoEmergencia: initialData?.contatoEmergencia ?? "",
+        nascimento: initialData?.nascimento ?? "",
+      });
+    }
+  }, [visible]);
+
+  async function onSubmit(data: FormData) {
+    if (!userProfile) return;
+    try {
+      await updateUsuario(userProfile.id, {
+        nome: data.nome,
+        email: data.email,
+        cpf: data.cpf,
+        contato: data.contato,
+        contatoEmerg: data.contatoEmergencia,
+        dataNasc: data.nascimento,
+      });
+      await refreshUserProfile();
+      onClose();
+    } catch {
+      Alert.alert("Erro", "Não foi possível salvar os dados.");
+    }
   }
 
   return (
@@ -100,77 +127,177 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                 Editar Dados
               </Text>
 
-              <Field label="Nome" required>
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="João da Silva"
-                  placeholderTextColor="#aaa"
-                  value={name}
-                  onChangeText={setName}
+              {/* Nome */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">
+                  Nome <Text className="text-primary">*</Text>
+                </Text>
+                <Controller
+                  control={control}
+                  name="nome"
+                  rules={{ required: "Nome é obrigatório" }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="João da Silva"
+                      placeholderTextColor="#aaa"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.nome?.message} />
+              </View>
 
-              <Field label="E-mail" required>
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="exemplo@mail.com"
-                  placeholderTextColor="#aaa"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
+              {/* E-mail */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">
+                  E-mail <Text className="text-primary">*</Text>
+                </Text>
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{
+                    required: "E-mail é obrigatório",
+                    pattern: EMAIL_PATTERN,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="joao@email.com"
+                      placeholderTextColor="#aaa"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.email?.message} />
+              </View>
 
-              <Field label="CPF" required>
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="XXX.XXX.XXX-XX"
-                  placeholderTextColor="#aaa"
-                  value={cpf}
-                  onChangeText={(v) => setCpf(formatCPF(v))}
-                  keyboardType="numeric"
+              {/* CPF */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">
+                  CPF <Text className="text-primary">*</Text>
+                </Text>
+                <Controller
+                  control={control}
+                  name="cpf"
+                  rules={{
+                    required: "CPF é obrigatório",
+                    validate: validarCPF,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="XXX.XXX.XXX-XX"
+                      placeholderTextColor="#aaa"
+                      value={value}
+                      onChangeText={(v) => onChange(formatCPF(v))}
+                      onBlur={onBlur}
+                      keyboardType="numeric"
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.cpf?.message} />
+              </View>
 
-              <Field label="Contato">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="(35)99999-9999"
-                  placeholderTextColor="#aaa"
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
+              {/* Contato */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">Contato</Text>
+                <Controller
+                  control={control}
+                  name="contato"
+                  rules={{
+                    validate: (v) => {
+                      if (!v) return true;
+                      return validarTelefone(v) || "Telefone inválido";
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="(35) 99999-9999"
+                      placeholderTextColor="#aaa"
+                      value={String(value || "")}
+                      onChangeText={(text) => onChange(formatContato(text))}
+                      onBlur={onBlur}
+                      keyboardType="phone-pad"
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.contato?.message} />
+              </View>
 
-              <Field label="Contato de emergência">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="(35)99999-9999"
-                  placeholderTextColor="#aaa"
-                  value={emergencyPhone}
-                  onChangeText={setEmergencyPhone}
-                  keyboardType="phone-pad"
+              {/* Contato de emergência */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">
+                  Contato de emergência
+                </Text>
+                <Controller
+                  control={control}
+                  name="contatoEmergencia"
+                  rules={{
+                    validate: (v) => {
+                      if (!v) return true;
+                      return validarTelefone(v) || "Telefone inválido";
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="(35) 99999-9999"
+                      placeholderTextColor="#aaa"
+                      value={String(value || "")}
+                      onChangeText={(text) => onChange(formatContato(text))}
+                      onBlur={onBlur}
+                      keyboardType="phone-pad"
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.contatoEmergencia?.message} />
+              </View>
 
-              <Field label="Data de Nascimento" required>
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="DD/MM/AAAA"
-                  placeholderTextColor="#aaa"
-                  value={birthDate}
-                  onChangeText={(v) => setBirthDate(formatDate(v))}
-                  keyboardType="numeric"
+              {/* Data de Nascimento */}
+              <View className="mb-5">
+                <Text className="text-grey-800 text-sm mb-1">
+                  Data de Nascimento <Text className="text-primary">*</Text>
+                </Text>
+                <Controller
+                  control={control}
+                  name="nascimento"
+                  rules={{
+                    required: "Data de nascimento é obrigatória",
+                    validate: validarData,
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                      placeholder="DD/MM/AAAA"
+                      placeholderTextColor="#aaa"
+                      value={value}
+                      onChangeText={(v) => onChange(formatDate(v))}
+                      onBlur={onBlur}
+                      keyboardType="numeric"
+                    />
+                  )}
                 />
-              </Field>
+                <FieldError message={errors.nascimento?.message} />
+              </View>
 
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
-                onPress={handleSave}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
               >
-                <Text className="text-white font-bold text-base">Salvar</Text>
+                {isSubmitting ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-white font-bold text-base">Salvar</Text>
+                )}
               </TouchableOpacity>
             </ScrollView>
           </View>
