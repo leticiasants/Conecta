@@ -1,5 +1,5 @@
 export interface IRegistro {
-  id?: string;
+  id: string;
   situacao: string;
   emocao: string;
   intensidade: number;

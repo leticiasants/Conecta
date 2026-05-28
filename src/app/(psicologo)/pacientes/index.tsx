@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 
 import { IPaciente } from "@/src/modules/paciente/ts/IPaciente";
+import { desvincularPaciente } from "@/src/modules/psicologo/services/desvincular-paciente";
 import { getAllPacientesDoPsicologo } from "@/src/modules/psicologo/services/get-all-pacientes-psicologo";
 import { ActionPosition, CardPaciente } from "./components";
 
@@ -90,14 +91,14 @@ export default function PacientesScreen() {
   }, [filtered, currentPage]);
 
   async function handleDesvincular() {
-    // if (!confirmFichaId) return;
-    // try {
-    //   await desvincularPaciente(confirmFichaId);
-    //   setPacientes((prev) => prev.filter((p) => p.fichaId !== confirmFichaId));
-    //   setConfirmFichaId(null);
-    // } catch {
-    //   Alert.alert("Erro", "Não foi possível remover paciente.");
-    // }
+    if (!confirmFichaId) return;
+    try {
+      await desvincularPaciente(confirmFichaId);
+      setPacientes((prev) => prev.filter((p) => p.idFicha !== confirmFichaId));
+      setConfirmFichaId(null);
+    } catch {
+      Alert.alert("Erro", "Não foi possível desvincular o paciente.");
+    }
   }
 
   return (
@@ -201,8 +202,8 @@ export default function PacientesScreen() {
             },
           },
           {
-            icon: "delete",
-            label: "Excluir",
+            icon: "link-off",
+            label: "Desvincular",
             iconColor: "#990000",
             labelClass: "text-sm font-semibold text-red",
 
@@ -217,7 +218,8 @@ export default function PacientesScreen() {
 
       <ConfirmModal
         visible={!!confirmFichaId}
-        message="Tem certeza de que deseja remover esse paciente?"
+        message="Tem certeza de que deseja desvincular esse paciente? Ele perderá o acesso às funcionalidades enquanto não tiver um novo psicólogo."
+        confirmLabel="Desvincular"
         onClose={() => setConfirmFichaId(null)}
         onConfirm={handleDesvincular}
       />

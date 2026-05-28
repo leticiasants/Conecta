@@ -1,3 +1,4 @@
+import { usePacientePermissao } from "@/src/app/(paciente)/_layout";
 import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
@@ -5,13 +6,13 @@ import { SearchBar } from "@/src/components/SearchBar";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAddRelato } from "@/src/modules/paciente/components";
 import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
-import { IRelato } from "@/src/modules/paciente/ts/IRegistro";
-import { getFichaDoPaciente } from "@/src/services/fichaAtendimentoService";
+import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registros";
+import { IRegistro } from "@/src/modules/paciente/ts/IRegistro";
+import { getFichaAtendimento } from "@/src/modules/usuario/services/get-ficha-atendimento";
 import {
   atualizarRegistro,
   criarRegistro,
   deletarRegistro,
-  listarRegistros,
 } from "@/src/services/registroService";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -20,19 +21,18 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { CardRelato } from "./components";
 
-type Relato = IRelato & { id: string };
-
 const ITEMS_PER_PAGE = 3;
 type ActionsState = { relatoId: string; position: ActionPosition };
 
 export default function RelatosScreen() {
   const { user } = useAuth();
+  const { temPsicologo } = usePacientePermissao();
   const [fichaId, setFichaId] = useState<string | null>(null);
-  const [relatos, setRelatos] = useState<Relato[]>([]);
+  const [relatos, setRelatos] = useState<IRegistro[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [addVisible, setAddVisible] = useState(false);
-  const [editData, setEditData] = useState<Relato | null>(null);
+  const [editData, setEditData] = useState<IRegistro | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [actionsState, setActionsState] = useState<ActionsState | null>(null);
 
@@ -47,13 +47,13 @@ export default function RelatosScreen() {
 
   const carregarRelatos = useCallback(async () => {
     if (!user) return;
-    const ficha = await getFichaDoPaciente(user.uid);
+    const ficha = await getFichaAtendimento(user.uid);
     if (!ficha) {
       setFichaId(null);
       return;
     }
     setFichaId(ficha.fichaId);
-    const data = await listarRegistros(ficha.fichaId);
+    const data = await getAllRegistros(ficha.fichaId);
     setRelatos(data);
   }, [user]);
 
@@ -79,8 +79,8 @@ export default function RelatosScreen() {
     setCurrentPage(1);
   }
 
-  async function handleAdd(data: IRelato) {
-    if (!fichaId) return;
+  async function handleAdd(data: IRegistro) {
+    if (!fichaId || !temPsicologo) return;
     try {
       await criarRegistro(fichaId, data);
       await carregarRelatos();
@@ -89,7 +89,7 @@ export default function RelatosScreen() {
     }
   }
 
-  async function handleEdit(data: IRelato) {
+  async function handleEdit(data: IRegistro) {
     if (!fichaId || !editData) return;
     try {
       await atualizarRegistro(fichaId, editData.id, data);
@@ -137,7 +137,8 @@ export default function RelatosScreen() {
           </View>
           <TouchableOpacity
             onPress={() => setAddVisible(true)}
-            disabled={!fichaId}
+            disabled={!fichaId || !temPsicologo}
+            style={{ opacity: !fichaId || !temPsicologo ? 0.4 : 1 }}
             className="w-11 h-11 rounded-full bg-primary items-center justify-center"
           >
             <MaterialIcons
@@ -148,6 +149,16 @@ export default function RelatosScreen() {
             />
           </TouchableOpacity>
         </View>
+
+        {fichaId && !temPsicologo && (
+          <View className="flex-row items-center gap-2 bg-yellow-50 border border-yellow-300 rounded-lg px-3 py-2 mb-2">
+            <MaterialIcons name="info-outline" size={16} color="#B45309" />
+            <Text className="text-xs text-yellow-800 flex-1">
+              Você não está vinculado a um psicólogo. Acesse Solicitações de
+              Vínculo para aceitar um convite.
+            </Text>
+          </View>
+        )}
 
         <SearchBar
           value={search}
@@ -163,6 +174,7 @@ export default function RelatosScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardRelato
+            id={item.id}
             situacao={item.situacao}
             emocao={item.emocao}
             intensidade={item.intensidade}

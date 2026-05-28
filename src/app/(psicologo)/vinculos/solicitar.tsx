@@ -8,9 +8,10 @@ import { getAllPacientes } from "@/src/modules/usuario/services/get-all-paciente
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CardVinculo } from "./components/CardVinculo";
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 3;
 
 export default function SolicitarVinculoScreen() {
   const { userProfile } = useAuth();
@@ -71,7 +72,7 @@ export default function SolicitarVinculoScreen() {
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <Text className="mb-1 text-2xl font-bold text-primary">
           Solicitar Vínculo
@@ -127,6 +128,6 @@ export default function SolicitarVinculoScreen() {
         current={currentPage}
         onPage={setCurrentPage}
       />
-    </View>
+    </SafeAreaView>
   );
 }

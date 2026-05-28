@@ -1,3 +1,5 @@
+import { db } from "@/src/lib/firebase";
+import { IUsuario } from "@/src/types/IUsuario";
 import {
   addDoc,
   collection,
@@ -9,9 +11,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "@/src/lib/firebase";
-import { IUsuario } from "@/src/types/IUsuario";
-import { getFichaDoPaciente } from "./fichaAtendimentoService";
+import { getFichaAtendimento } from "../modules/usuario/services/get-ficha-atendimento";
 
 export interface ISolicitacao {
   id: string;
@@ -28,13 +28,13 @@ export interface ISolicitacao {
 
 export async function solicitar(
   psicologo: IUsuario,
-  paciente: { id: string; nome: string; email: string; contato?: string }
+  paciente: { id: string; nome: string; email: string; contato?: string },
 ): Promise<void> {
   const q = query(
     collection(db, "solicitacoes_vinculo"),
     where("id_psicologo", "==", psicologo.id),
     where("id_paciente", "==", paciente.id),
-    where("status", "==", "pendente")
+    where("status", "==", "pendente"),
   );
   const existing = await getDocs(q);
   if (!existing.empty) return;
@@ -55,30 +55,32 @@ export async function solicitar(
 }
 
 export async function listarPendentesDoPsicologo(
-  psicologoId: string
+  psicologoId: string,
 ): Promise<ISolicitacao[]> {
   const q = query(
     collection(db, "solicitacoes_vinculo"),
     where("id_psicologo", "==", psicologoId),
-    where("status", "==", "pendente")
+    where("status", "==", "pendente"),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ISolicitacao));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ISolicitacao);
 }
 
 export async function listarParaPaciente(
-  pacienteId: string
+  pacienteId: string,
 ): Promise<ISolicitacao[]> {
   const q = query(
     collection(db, "solicitacoes_vinculo"),
     where("id_paciente", "==", pacienteId),
-    where("status", "==", "pendente")
+    where("status", "==", "pendente"),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ISolicitacao));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ISolicitacao);
 }
 
-export async function cancelarSolicitacao(solicitacaoId: string): Promise<void> {
+export async function cancelarSolicitacao(
+  solicitacaoId: string,
+): Promise<void> {
   await updateDoc(doc(db, "solicitacoes_vinculo", solicitacaoId), {
     status: "cancelado",
     data_atualizacao: serverTimestamp(),
@@ -95,11 +97,11 @@ export async function recusar(solicitacaoId: string): Promise<void> {
 export async function aceitar(
   solicitacaoId: string,
   pacienteId: string,
-  psicologoId: string
+  psicologoId: string,
 ): Promise<void> {
   const batch = writeBatch(db);
 
-  const fichaAtual = await getFichaDoPaciente(pacienteId);
+  const fichaAtual = await getFichaAtendimento(pacienteId);
   if (fichaAtual) {
     batch.update(doc(db, "fichaAtendimento", fichaAtual.fichaId), {
       status: "inativo",

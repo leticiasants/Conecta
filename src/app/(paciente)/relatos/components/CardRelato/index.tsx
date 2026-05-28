@@ -9,6 +9,7 @@ interface Props extends IRegistro {
 }
 
 export function CardRelato({
+  id,
   situacao,
   emocao,
   intensidade,
