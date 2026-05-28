@@ -1,24 +1,41 @@
+import { formatDate } from "@/src/utils/formatters";
 import { MaterialIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
   Text,
   TextInput,
+  TextInputProps,
   TouchableOpacity,
   View,
 } from "react-native";
-import { IRelato } from "../../ts/IRegistro";
-import { formatDate } from "@/src/utils/formatters";
+import { IRegistro } from "../../ts/IRegistro";
+
+type RegistroForm = Omit<IRegistro, "id">;
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: IRelato;
-  onSave: (data: IRelato) => void;
+  initialData?: RegistroForm;
+  onSave: (data: RegistroForm) => void;
+}
+
+const inputStyle = "bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800";
+
+function createEmptyForm(): RegistroForm {
+  return {
+    situacao: "",
+    emocao: "",
+    intensidade: 5,
+    descricao: "",
+    dataOcorrido: "",
+    dataCriacao: "",
+  };
 }
 
 function Field({
@@ -33,40 +50,71 @@ function Field({
       <Text className="text-grey-800 text-sm mb-1">
         {label} <Text className="text-primary">*</Text>
       </Text>
+
       {children}
     </View>
   );
 }
 
-const EMPTY: IRelato = {
-  situacao: "",
-  emocao: "",
-  intensidade: 5,
-  descricao: "",
-  dataOcorrido: "",
-};
+function Input(props: TextInputProps) {
+  return (
+    <TextInput className={inputStyle} placeholderTextColor="#aaa" {...props} />
+  );
+}
 
-export function ModalAddRelato({
+export function ModalAddRegistro({
   visible,
   onClose,
   initialData,
   onSave,
 }: Props) {
-  const [form, setForm] = useState<IRelato>(initialData ?? EMPTY);
+  const [form, setForm] = useState<RegistroForm>(createEmptyForm());
 
-  function set<K extends keyof IRelato>(key: K, value: IRelato[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const isEditing = useMemo(() => !!initialData, [initialData]);
+
+  useEffect(() => {
+    if (visible) {
+      setForm(initialData ?? createEmptyForm());
+    }
+  }, [initialData, visible]);
+
+  function updateField<K extends keyof RegistroForm>(
+    key: K,
+    value: RegistroForm[K],
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   }
 
-  function handleSubmit() {
-    // TODO: integrar com API
-    onSave(form);
-    setForm(EMPTY);
-    onClose();
+  function resetForm() {
+    setForm(createEmptyForm());
   }
 
   function handleClose() {
-    setForm(EMPTY);
+    resetForm();
+    onClose();
+  }
+
+  function handleSubmit() {
+    if (
+      !form.situacao.trim() ||
+      !form.emocao.trim() ||
+      !form.descricao.trim() ||
+      !form.dataOcorrido.trim()
+    ) {
+      Alert.alert(
+        "Campos obrigatórios",
+        "Preencha todos os campos obrigatórios.",
+      );
+
+      return;
+    }
+
+    onSave(form);
+
+    resetForm();
     onClose();
   }
 
@@ -82,14 +130,15 @@ export function ModalAddRelato({
           className="w-full"
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View className="bg-white rounded-3xl w-full">
+          <View className="bg-white rounded-3xl w-full max-h-[90%]">
             <ScrollView
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={{
                 paddingHorizontal: 24,
                 paddingBottom: 40,
               }}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
             >
               <TouchableOpacity
                 onPress={handleClose}
@@ -99,26 +148,22 @@ export function ModalAddRelato({
               </TouchableOpacity>
 
               <Text className="text-4xl font-bold text-primary text-center mb-8">
-                Adicionar Relato
+                {isEditing ? "Editar Relato" : "Adicionar Relato"}
               </Text>
 
               <Field label="Situação">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+                <Input
                   placeholder="Ex.: Dia feliz"
-                  placeholderTextColor="#aaa"
                   value={form.situacao}
-                  onChangeText={(v) => set("situacao", v)}
+                  onChangeText={(v) => updateField("situacao", v)}
                 />
               </Field>
 
               <Field label="Emoção Principal">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                  placeholder="Ex.: Alegria, Tristeza."
-                  placeholderTextColor="#aaa"
+                <Input
+                  placeholder="Ex.: Alegria, Tristeza..."
                   value={form.emocao}
-                  onChangeText={(v) => set("emocao", v)}
+                  onChangeText={(v) => updateField("emocao", v)}
                 />
               </Field>
 
@@ -126,16 +171,23 @@ export function ModalAddRelato({
                 <Text className="text-grey-800 text-sm mb-1">
                   Intensidade da emoção <Text className="text-primary">*</Text>
                 </Text>
+
+                <Text className="text-center text-primary font-bold mb-2">
+                  {form.intensidade}
+                </Text>
+
                 <View className="flex-row justify-between mb-1">
                   <Text className="text-xs text-primary font-bold">1</Text>
+
                   <Text className="text-xs text-primary font-bold">10</Text>
                 </View>
+
                 <Slider
                   minimumValue={1}
                   maximumValue={10}
                   step={1}
                   value={form.intensidade}
-                  onValueChange={(v) => set("intensidade", v)}
+                  onValueChange={(v) => updateField("intensidade", v)}
                   minimumTrackTintColor="#5C868E"
                   maximumTrackTintColor="#D0D0D0"
                   thumbTintColor="#5C868E"
@@ -143,36 +195,37 @@ export function ModalAddRelato({
               </View>
 
               <Field label="Descrição">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-3 text-sm text-grey-800"
+                <Input
                   placeholder="Escreva o que ocorreu e como se sentiu."
-                  placeholderTextColor="#aaa"
                   value={form.descricao}
-                  onChangeText={(v) => set("descricao", v)}
+                  onChangeText={(v) => updateField("descricao", v)}
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
-                  style={{ minHeight: 100 }}
+                  style={{
+                    minHeight: 100,
+                  }}
                 />
               </Field>
 
-              <Field label="Data do Ocorrido">
-                <TextInput
-                  className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
+              <Field label="Data do ocorrido">
+                <Input
                   placeholder="DD/MM/AAAA"
-                  placeholderTextColor="#aaa"
-                  value={form.dataOcorrido}
-                  onChangeText={(v) => set("dataOcorrido", formatDate(v))}
                   keyboardType="numeric"
+                  value={form.dataOcorrido}
+                  onChangeText={(v) =>
+                    updateField("dataOcorrido", formatDate(v))
+                  }
                 />
               </Field>
 
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
                 onPress={handleSubmit}
+                activeOpacity={0.8}
               >
                 <Text className="text-white font-bold text-base">
-                  Adicionar
+                  {isEditing ? "Salvar alterações" : "Adicionar"}
                 </Text>
               </TouchableOpacity>
             </ScrollView>

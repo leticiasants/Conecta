@@ -3,7 +3,7 @@ import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
-import { ModalAddRelato } from "@/src/modules/paciente/components";
+import { ModalAddRegistro } from "@/src/modules/paciente/components";
 import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
 import { createRegistro } from "@/src/modules/paciente/services/create-registro";
 import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registros";
@@ -32,6 +32,8 @@ export default function RelatosScreen() {
   const [actionsState, setActionsState] = useState<ActionsState | null>(null);
 
   const { openAdd } = useLocalSearchParams<{ openAdd?: string }>();
+
+  type RegistroForm = Omit<IRegistro, "id">;
 
   useEffect(() => {
     if (openAdd === "1") {
@@ -73,8 +75,9 @@ export default function RelatosScreen() {
     setCurrentPage(1);
   }
 
-  async function handleAdd(data: IRegistro) {
+  async function handleAdd(data: RegistroForm) {
     if (!fichaId || !temPsicologo) return;
+
     try {
       await createRegistro(fichaId, data);
       await carregarRelatos();
@@ -219,7 +222,7 @@ export default function RelatosScreen() {
         ]}
       />
 
-      <ModalAddRelato
+      <ModalAddRegistro
         visible={addVisible}
         onClose={() => setAddVisible(false)}
         onSave={handleAdd}

@@ -2,9 +2,11 @@ import { db } from "@/src/lib/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { IRegistro } from "../ts/IRegistro";
 
+type RegistroForm = Omit<IRegistro, "id">;
+
 export async function createRegistro(
   fichaId: string,
-  data: IRegistro,
+  data: RegistroForm,
 ): Promise<void> {
   await addDoc(collection(db, "fichaAtendimento", fichaId, "registro"), {
     situacao: data.situacao,
