@@ -3,7 +3,7 @@ import { collection, getDocs, or, query, where } from "firebase/firestore";
 
 export async function getFichaAtendimento(
   idUsuario: string,
-): Promise<{ fichaId: string; psicologoId: string } | null> {
+): Promise<{ fichaId: string; psicologoId: string | null } | null> {
   const q = query(
     collection(db, "fichaAtendimento"),
     or(

@@ -3,31 +3,26 @@ import { ActionsDropdownModal } from "@/src/components/ActionsDropdownModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
-import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAddRelato } from "@/src/modules/paciente/components";
 import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
+import { createRegistro } from "@/src/modules/paciente/services/create-registro";
 import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registros";
+import { updateRegistro } from "@/src/modules/paciente/services/update-registro";
 import { IRegistro } from "@/src/modules/paciente/ts/IRegistro";
-import { getFichaAtendimento } from "@/src/modules/usuario/services/get-ficha-atendimento";
-import {
-  atualizarRegistro,
-  criarRegistro,
-  deletarRegistro,
-} from "@/src/services/registroService";
+import { deletarRegistro } from "@/src/services/registroService";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CardRelato } from "./components";
 
 const ITEMS_PER_PAGE = 3;
 type ActionsState = { relatoId: string; position: ActionPosition };
 
 export default function RelatosScreen() {
-  const { user } = useAuth();
-  const { temPsicologo } = usePacientePermissao();
-  const [fichaId, setFichaId] = useState<string | null>(null);
+  const { temPsicologo, fichaId } = usePacientePermissao();
   const [relatos, setRelatos] = useState<IRegistro[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,16 +41,15 @@ export default function RelatosScreen() {
   }, [openAdd]);
 
   const carregarRelatos = useCallback(async () => {
-    if (!user) return;
-    const ficha = await getFichaAtendimento(user.uid);
-    if (!ficha) {
-      setFichaId(null);
+    if (!fichaId) {
+      setRelatos([]);
       return;
     }
-    setFichaId(ficha.fichaId);
-    const data = await getAllRegistros(ficha.fichaId);
+    const data = await getAllRegistros(fichaId);
     setRelatos(data);
-  }, [user]);
+  }, [fichaId]);
+
+  console.log("Relatos render", { fichaId, relatos });
 
   useEffect(() => {
     carregarRelatos();
@@ -82,7 +76,7 @@ export default function RelatosScreen() {
   async function handleAdd(data: IRegistro) {
     if (!fichaId || !temPsicologo) return;
     try {
-      await criarRegistro(fichaId, data);
+      await createRegistro(fichaId, data);
       await carregarRelatos();
     } catch {
       Alert.alert("Erro", "Não foi possível salvar o relato.");
@@ -92,7 +86,7 @@ export default function RelatosScreen() {
   async function handleEdit(data: IRegistro) {
     if (!fichaId || !editData) return;
     try {
-      await atualizarRegistro(fichaId, editData.id, data);
+      await updateRegistro(fichaId, editData.id, data);
       setRelatos((prev) =>
         prev.map((r) =>
           r.id === editData.id ? { ...data, id: editData.id } : r,
@@ -124,7 +118,7 @@ export default function RelatosScreen() {
     : null;
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <View className="flex-row items-start justify-between mb-1">
           <View>
@@ -255,6 +249,6 @@ export default function RelatosScreen() {
         onClose={() => setConfirmId(null)}
         onConfirm={handleDelete}
       />
-    </View>
+    </SafeAreaView>
   );
 }

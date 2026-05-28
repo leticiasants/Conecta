@@ -30,17 +30,23 @@ export function usePacientePermissao() {
 }
 
 export default function PacienteLayout() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [fichaId, setFichaId] = useState<string | null>(null);
   const [temPsicologo, setTemPsicologo] = useState(false);
 
   const recarregarFicha = useCallback(async () => {
     if (!user) return;
-    const ficha = await getFichaAtendimento(user.uid);
+    // createPaciente stores idPaciente as Firestore doc ID (userProfile.id)
+    // aceitar stores idPaciente as Firebase Auth UID (user.uid)
+    // Try both to handle both creation paths
+    let ficha = userProfile?.id ? await getFichaAtendimento(userProfile.id) : null;
+    if (!ficha) {
+      ficha = await getFichaAtendimento(user.uid);
+    }
     setFichaId(ficha?.fichaId ?? null);
     setTemPsicologo(!!ficha?.psicologoId);
-  }, [user]);
+  }, [user, userProfile]);
 
   useEffect(() => {
     recarregarFicha();
