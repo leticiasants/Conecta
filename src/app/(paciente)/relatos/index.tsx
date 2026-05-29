@@ -6,10 +6,10 @@ import { SearchBar } from "@/src/components/SearchBar";
 import { ModalAddRegistro } from "@/src/modules/paciente/components";
 import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
 import { createRegistro } from "@/src/modules/paciente/services/create-registro";
+import { deleteRegistro } from "@/src/modules/paciente/services/delete-registro";
 import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registros";
 import { updateRegistro } from "@/src/modules/paciente/services/update-registro";
 import { IRegistro } from "@/src/modules/paciente/ts/IRegistro";
-import { deletarRegistro } from "@/src/services/registroService";
 import type { ActionPosition } from "@/src/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -50,8 +50,6 @@ export default function RelatosScreen() {
     const data = await getAllRegistros(fichaId);
     setRelatos(data);
   }, [fichaId]);
-
-  console.log("Relatos render", { fichaId, relatos });
 
   useEffect(() => {
     carregarRelatos();
@@ -104,7 +102,7 @@ export default function RelatosScreen() {
   async function handleDelete() {
     if (!fichaId || !confirmId) return;
     try {
-      await deletarRegistro(fichaId, confirmId);
+      await deleteRegistro(fichaId, confirmId);
       setRelatos((prev) => prev.filter((r) => r.id !== confirmId));
       setConfirmId(null);
     } catch {
@@ -233,6 +231,7 @@ export default function RelatosScreen() {
         initialData={
           editData
             ? {
+                id: editData.id,
                 situacao: editData.situacao,
                 emocao: editData.emocao,
                 intensidade: editData.intensidade,

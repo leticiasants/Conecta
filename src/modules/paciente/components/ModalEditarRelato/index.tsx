@@ -1,6 +1,7 @@
+import { formatDate } from "@/src/utils/formatters";
 import { MaterialIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -11,14 +12,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IRelato } from "../../ts/IRegistro";
-import { formatDate } from "@/src/utils/formatters";
+import { IRegistro } from "../../ts/IRegistro";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: IRelato;
-  onSave: (data: IRelato) => void;
+  initialData?: IRegistro;
+  onSave: (data: IRegistro) => void;
 }
 
 function Field({
@@ -38,7 +38,8 @@ function Field({
   );
 }
 
-const EMPTY: IRelato = {
+const EMPTY: IRegistro = {
+  id: "",
   situacao: "",
   emocao: "",
   intensidade: 5,
@@ -52,9 +53,15 @@ export function ModalEditarRelato({
   initialData,
   onSave,
 }: Props) {
-  const [form, setForm] = useState<IRelato>(initialData ?? EMPTY);
+  const [form, setForm] = useState<IRegistro>(initialData ?? EMPTY);
 
-  function set<K extends keyof IRelato>(key: K, value: IRelato[K]) {
+  useEffect(() => {
+    if (visible) {
+      setForm(initialData ?? EMPTY);
+    }
+  }, [visible, initialData]);
+
+  function set<K extends keyof IRegistro>(key: K, value: IRegistro[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
