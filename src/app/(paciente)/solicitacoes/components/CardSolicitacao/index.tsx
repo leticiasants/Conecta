@@ -2,18 +2,12 @@ import { IDadosPsicologo } from "@/src/modules/psicologo/ts/IDadosPsicologo";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-interface Props extends Pick<IDadosPsicologo, "nome" | "email" | "crp"> {
+interface Props extends Pick<IDadosPsicologo, "nome" | "crp"> {
   onRecusar: () => void;
   onAceitar: () => void;
 }
 
-export function CardSolicitacao({
-  nome,
-  email,
-  crp,
-  onRecusar,
-  onAceitar,
-}: Props) {
+export function CardSolicitacao({ nome, crp, onRecusar, onAceitar }: Props) {
   return (
     <View
       className="mx-4 mb-4 bg-white px-4 py-4"
@@ -27,10 +21,6 @@ export function CardSolicitacao({
       }}
     >
       <Text className="font-bold text-base text-grey-800 mb-1">{nome}</Text>
-      <Text className="text-sm text-grey-800 mb-0.5">
-        <Text className="font-bold no-underline">E-mail: </Text>
-        {email}
-      </Text>
       <Text className="text-sm text-grey-800 mb-3">
         <Text className="font-bold">CRP: </Text>
         {crp}

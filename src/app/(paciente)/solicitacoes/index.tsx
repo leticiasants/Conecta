@@ -1,37 +1,43 @@
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAceitarVinculo } from "@/src/modules/paciente/components";
-import {
-  aceitar,
-  ISolicitacao,
-  listarParaPaciente,
-  recusar,
-} from "@/src/services/solicitacaoService";
+import { getAllSolicitacaoVinculo } from "@/src/modules/paciente/services/get-all-solicitacao-vinculo";
+import { deleteSolicitacaoVinculo } from "@/src/modules/psicologo/services/delete-solicitacao-vinculo";
+import { aceitar } from "@/src/services/solicitacaoService";
+import { ISolicitacao } from "@/src/types/ISolicitacao";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
 import { CardSolicitacao } from "./components/CardSolicitacao";
 
 export default function SolicitacoesScreen() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
-  const [recusarId, setRecusarId] = useState<string | null>(null);
+  const [recusarItem, setRecusarItem] = useState<ISolicitacao | null>(null);
   const [aceitarItem, setAceitarItem] = useState<ISolicitacao | null>(null);
 
   const carregar = useCallback(async () => {
-    if (!user) return;
-    const data = await listarParaPaciente(user.uid);
+    if (!userProfile) return;
+    const data = await getAllSolicitacaoVinculo(userProfile.id);
     setSolicitacoes(data);
-  }, [user]);
+  }, [userProfile]);
 
-  useEffect(() => { carregar(); }, [carregar]);
+  useEffect(() => {
+    carregar();
+  }, [carregar]);
 
   async function handleRecusar() {
-    if (!recusarId) return;
+    if (!recusarItem) return;
+
     try {
-      await recusar(recusarId);
-      setSolicitacoes((prev) => prev.filter((s) => s.id !== recusarId));
-      setRecusarId(null);
+      await deleteSolicitacaoVinculo(
+        recusarItem.idFichaAtendimento,
+        recusarItem.id,
+      );
+
+      setSolicitacoes((prev) => prev.filter((s) => s.id !== recusarItem.id));
+
+      setRecusarItem(null);
     } catch {
       Alert.alert("Erro", "Não foi possível recusar a solicitação.");
     }
@@ -40,15 +46,13 @@ export default function SolicitacoesScreen() {
   async function handleAceitar() {
     if (!aceitarItem || !user) return;
     try {
-      await aceitar(aceitarItem.id, user.uid, aceitarItem.id_psicologo);
+      await aceitar(aceitarItem.id, user.uid, aceitarItem.idNovoPsicologo);
       setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarItem.id));
       setAceitarItem(null);
     } catch {
       Alert.alert("Erro", "Não foi possível aceitar a solicitação.");
     }
   }
-
-  const recusarItem = solicitacoes.find((s) => s.id === recusarId);
 
   return (
     <View className="flex-1 bg-white">
@@ -68,10 +72,9 @@ export default function SolicitacoesScreen() {
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardSolicitacao
-            nome={item.nome_psicologo}
-            email={item.email_psicologo}
-            crp={item.crp_psicologo}
-            onRecusar={() => setRecusarId(item.id)}
+            nome={item.nomePsicologo ?? "Profissional Desconecido"}
+            crp={item.crpPsicologo ? item.crpPsicologo : "CRP não disponível"}
+            onRecusar={() => setRecusarItem(item)}
             onAceitar={() => setAceitarItem(item)}
           />
         )}
@@ -86,10 +89,10 @@ export default function SolicitacoesScreen() {
       />
 
       <ConfirmModal
-        visible={!!recusarId}
-        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nome_psicologo ?? "este profissional"}?`}
+        visible={!!recusarItem}
+        message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nomePsicologo ?? "este profissional"}?`}
         confirmLabel="Recusar"
-        onClose={() => setRecusarId(null)}
+        onClose={() => setRecusarItem(null)}
         onConfirm={handleRecusar}
       />
 
