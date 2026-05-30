@@ -7,6 +7,7 @@ module.exports = {
       colors: {
         primary: "#5C868E",
         secondary: "#97BFAB",
+        tertiary: "#5C3D46",
         grey: {
           800: "#3D3D3D",
           500: "#828282",

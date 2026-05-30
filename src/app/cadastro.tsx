@@ -26,7 +26,7 @@ type FormData = {
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <Text className="text-red-300 text-xs mt-1">{message}</Text>;
+  return <Text className="text-tertiary text-xs mt-1.5">{message}</Text>;
 }
 
 export default function CadastroScreen() {

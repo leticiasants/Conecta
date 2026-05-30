@@ -18,7 +18,7 @@ type FormData = { email: string; senha: string };
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <Text className="text-red-300 text-xs mt-1 mb-2">{message}</Text>;
+  return <Text className="text-tertiary text-xs mt-1.5 mb-2">{message}</Text>;
 }
 
 export default function LoginScreen() {
@@ -51,6 +51,7 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 justify-end bg-white">
+      <View className="absolute bottom-0 left-0 right-0 h-24 bg-primary" />
       <KeyboardAvoidingView
         behavior="padding"
         className="flex-1"
@@ -79,7 +80,7 @@ export default function LoginScreen() {
 
           <View className="mb-2">
             <Text className="text-white font-primary-medium text-sm mb-1">
-              E-mail
+              E-mail <Text className="text-secondary">*</Text>
             </Text>
             <Controller
               control={control}
@@ -105,7 +106,7 @@ export default function LoginScreen() {
 
           <View className="mb-2">
             <Text className="text-white font-primary-medium text-sm mb-1">
-              Senha
+              Senha <Text className="text-secondary">*</Text>
             </Text>
             <Controller
               control={control}
