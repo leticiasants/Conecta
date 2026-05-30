@@ -1,10 +1,9 @@
-import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "@/src/lib/firebase";
-
-import { getUsuario } from "@/src/services/usuarioService";
 import { IUsuario } from "@/src/types/IUsuario";
+import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
+import { createContext, useContext, useEffect, useState } from "react";
 import { logout } from "../modules/auth/services/logout";
+import { getUsuario } from "../modules/usuario/services/get-usuario";
 
 interface IAuthContext {
   user: FirebaseUser | null;
