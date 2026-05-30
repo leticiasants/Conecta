@@ -78,31 +78,31 @@ function traduzirErro(code: string): string {
 //   }
 // }
 
-export async function deleteAccountPsicologo(uid: string): Promise<void> {
-  const psicologoSnap = await getDocs(
-    query(collection(db, "usuario"), where("idAuth", "==", uid)),
-  );
-  if (psicologoSnap.empty) throw new Error("Usuário não encontrado.");
-  const psicologoDocId = psicologoSnap.docs[0].id;
+// export async function deleteAccountPsicologo(uid: string): Promise<void> {
+//   const psicologoSnap = await getDocs(
+//     query(collection(db, "usuario"), where("idAuth", "==", uid)),
+//   );
+//   if (psicologoSnap.empty) throw new Error("Usuário não encontrado.");
+//   const psicologoDocId = psicologoSnap.docs[0].id;
 
-  const fichasSnap = await getDocs(
-    query(
-      collection(db, "fichaAtendimento"),
-      where("idPsicologo", "==", psicologoDocId),
-      where("status", "==", "ativo"),
-    ),
-  );
-  const batch = writeBatch(db);
-  fichasSnap.docs.forEach((d) =>
-    batch.update(d.ref, {
-      status: "inativo",
-      data_atualizacao: serverTimestamp(),
-    }),
-  );
-  batch.delete(doc(db, "usuario", psicologoDocId));
-  await batch.commit();
-  if (auth.currentUser) await deleteUser(auth.currentUser);
-}
+//   const fichasSnap = await getDocs(
+//     query(
+//       collection(db, "fichaAtendimento"),
+//       where("idPsicologo", "==", psicologoDocId),
+//       where("status", "==", "ativo"),
+//     ),
+//   );
+//   const batch = writeBatch(db);
+//   fichasSnap.docs.forEach((d) =>
+//     batch.update(d.ref, {
+//       status: "inativo",
+//       data_atualizacao: serverTimestamp(),
+//     }),
+//   );
+//   batch.delete(doc(db, "usuario", psicologoDocId));
+//   await batch.commit();
+//   if (auth.currentUser) await deleteUser(auth.currentUser);
+// }
 
 export async function deleteAccountPaciente(uid: string): Promise<void> {
   const pacienteSnap = await getDocs(

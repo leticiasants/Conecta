@@ -37,7 +37,7 @@ export default function RegistrosScreen() {
 
   useEffect(() => {
     carregarRegistros();
-  }, [fichaIdStr]);
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);

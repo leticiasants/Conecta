@@ -1,13 +1,12 @@
+import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
+import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { deletePsicologo } from "@/src/modules/auth/services/delete-psicologo";
+import { ModalEditarDados } from "@/src/modules/psicologo/components";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
-
-import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
-import { ConfirmModal } from "@/src/components/ConfirmModal";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { ModalEditarDados } from "@/src/modules/psicologo/components";
-import { deleteAccountPsicologo } from "@/src/services/authService";
 
 export default function MeusDadosScreen() {
   const { user, userProfile, signOut } = useAuth();
@@ -20,7 +19,7 @@ export default function MeusDadosScreen() {
   async function handleExcluirConta() {
     if (!user) return;
     try {
-      await deleteAccountPsicologo(user.uid);
+      await deletePsicologo(user.uid);
       router.replace("/login");
     } catch (err: any) {
       if (err.code === "auth/requires-recent-login") {

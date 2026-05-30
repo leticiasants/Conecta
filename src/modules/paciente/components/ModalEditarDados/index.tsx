@@ -1,5 +1,4 @@
 import { useAuth } from "@/src/contexts/AuthContext";
-
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
 import { IUsuario } from "@/src/types/IUsuario";
 import { formatCPF, formatContato, formatDate } from "@/src/utils/formatters";

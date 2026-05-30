@@ -1,8 +1,8 @@
 import { AlterarSenhaModal } from "@/src/components/AlterarSenhaModal";
 import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { deletePaciente } from "@/src/modules/auth/services/delete-paciente";
 import { ModalEditarDados } from "@/src/modules/paciente/components";
-import { deleteAccountPaciente } from "@/src/services/authService";
 import { formatContato } from "@/src/utils/formatters";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -20,7 +20,7 @@ export default function MeusDadosScreen() {
   async function handleExcluirConta() {
     if (!user) return;
     try {
-      await deleteAccountPaciente(user.uid);
+      await deletePaciente(user.uid);
       router.replace("/login");
     } catch (err: any) {
       if (err.code === "auth/requires-recent-login") {

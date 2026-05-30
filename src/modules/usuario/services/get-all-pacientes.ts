@@ -3,6 +3,7 @@ import {
   collection,
   documentId,
   getDocs,
+  or,
   query,
   where,
 } from "firebase/firestore";
@@ -15,7 +16,10 @@ export async function getAllPacientes(
     const fichasSnap = await getDocs(
       query(
         collection(db, "fichaAtendimento"),
-        where("idPsicologo", "!=", psicologoId),
+        or(
+          where("idPsicologo", "!=", psicologoId),
+          where("idPsicologo", "==", null),
+        ),
       ),
     );
 
