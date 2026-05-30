@@ -2,8 +2,8 @@ import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAceitarVinculo } from "@/src/modules/paciente/components";
 import { getAllSolicitacaoVinculo } from "@/src/modules/paciente/services/get-all-solicitacao-vinculo";
+import { updateVinculo } from "@/src/modules/paciente/services/update-vinculo";
 import { deleteSolicitacaoVinculo } from "@/src/modules/psicologo/services/delete-solicitacao-vinculo";
-import { aceitar } from "@/src/services/solicitacaoService";
 import { ISolicitacao } from "@/src/types/ISolicitacao";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import { Alert, FlatList, Text, View } from "react-native";
 import { CardSolicitacao } from "./components/CardSolicitacao";
 
 export default function SolicitacoesScreen() {
-  const { user, userProfile } = useAuth();
+  const { userProfile } = useAuth();
   const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
   const [recusarItem, setRecusarItem] = useState<ISolicitacao | null>(null);
   const [aceitarItem, setAceitarItem] = useState<ISolicitacao | null>(null);
@@ -43,11 +43,23 @@ export default function SolicitacoesScreen() {
     }
   }
 
-  async function handleAceitar() {
-    if (!aceitarItem || !user) return;
+  async function handleAceitar(newFicha: boolean = false) {
+    if (!aceitarItem) return;
+
     try {
-      await aceitar(aceitarItem.id, user.uid, aceitarItem.idNovoPsicologo);
+      await updateVinculo(
+        aceitarItem.idFichaAtendimento,
+        aceitarItem.idNovoPsicologo,
+        newFicha,
+      );
+
+      await deleteSolicitacaoVinculo(
+        aceitarItem.idFichaAtendimento,
+        aceitarItem.id,
+      );
+
       setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarItem.id));
+
       setAceitarItem(null);
     } catch {
       Alert.alert("Erro", "Não foi possível aceitar a solicitação.");
@@ -99,7 +111,7 @@ export default function SolicitacoesScreen() {
       <ModalAceitarVinculo
         visible={!!aceitarItem}
         onClose={() => setAceitarItem(null)}
-        onIniciarNovaFicha={handleAceitar}
+        onIniciarNovaFicha={() => handleAceitar(true)}
         onCompartilharRegistros={handleAceitar}
       />
     </View>

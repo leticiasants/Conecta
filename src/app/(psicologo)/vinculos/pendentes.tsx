@@ -64,8 +64,6 @@ export default function VinculosPendentesScreen() {
   async function handleCancelar() {
     if (!confirmId) return;
 
-    console.log("Confirmando cancelamento da solicitação com ID:", confirmId);
-
     try {
       const solicitacao = solicitacoes.find(
         (s) => s.idSolicitacao === confirmId,

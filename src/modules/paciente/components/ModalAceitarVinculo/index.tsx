@@ -1,4 +1,4 @@
-import { Modal, View, Text, TouchableOpacity, Pressable } from "react-native";
+import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   visible: boolean;
