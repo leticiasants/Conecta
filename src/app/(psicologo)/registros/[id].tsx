@@ -90,6 +90,7 @@ export default function RegistrosScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
           <CardRelato
+            id={item.id}
             situacao={item.situacao}
             emocao={item.emocao}
             intensidade={item.intensidade}

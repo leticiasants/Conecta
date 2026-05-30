@@ -5,7 +5,7 @@ export interface IUsuario {
   idAuth: string;
   nome: string;
   email: string;
-  tipo: TipoUsuario;
+  tipo?: TipoUsuario;
   crp?: string;
   cpf?: string;
   contato?: string;

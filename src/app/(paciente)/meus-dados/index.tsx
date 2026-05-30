@@ -3,6 +3,7 @@ import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalEditarDados } from "@/src/modules/paciente/components";
 import { deleteAccountPaciente } from "@/src/services/authService";
+import { formatContato } from "@/src/utils/formatters";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -79,10 +80,15 @@ export default function MeusDadosScreen() {
             label="Data de Nascimento"
             value={paciente.dataNasc ?? "—"}
           />
-          <DataRow label="Contato" value={paciente.contato ?? "—"} />
+          <DataRow
+            label="Contato"
+            value={paciente.contato ? formatContato(paciente.contato) : "—"}
+          />
           <DataRow
             label="Contato de emergência"
-            value={paciente.contatoEmerg ?? "—"}
+            value={
+              paciente.contatoEmerg ? formatContato(paciente.contatoEmerg) : "—"
+            }
             last
           />
         </View>
@@ -141,8 +147,8 @@ export default function MeusDadosScreen() {
           email: paciente.email,
           cpf: paciente.cpf ?? "",
           contato: paciente.contato,
-          contatoEmergencia: paciente.contatoEmerg,
-          nascimento: paciente.dataNasc,
+          contatoEmerg: paciente.contatoEmerg,
+          dataNasc: paciente.dataNasc,
         }}
       />
 

@@ -1,6 +1,7 @@
 import { useAuth } from "@/src/contexts/AuthContext";
 
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
+import { IUsuario } from "@/src/types/IUsuario";
 import { formatCPF, formatContato, formatDate } from "@/src/utils/formatters";
 import {
   EMAIL_PATTERN,
@@ -23,12 +24,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IPaciente } from "../../ts/IPaciente";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  initialData?: IPaciente;
+  initialData?: Omit<
+    IUsuario,
+    "idAuth" | "tipo" | "crp" | "dataCriacao" | "dataAtualizacao"
+  >;
 }
 
 type FormData = {
@@ -36,8 +39,8 @@ type FormData = {
   email: string;
   cpf: string;
   contato: string;
-  contatoEmergencia: string;
-  nascimento: string;
+  contatoEmerg: string;
+  dataNasc: string;
 };
 
 function FieldError({ message }: { message?: string }) {
@@ -59,8 +62,8 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
       email: initialData?.email ?? "",
       cpf: initialData?.cpf ?? "",
       contato: initialData?.contato ?? "",
-      contatoEmergencia: initialData?.contatoEmergencia ?? "",
-      nascimento: initialData?.nascimento ?? "",
+      contatoEmerg: initialData?.contatoEmerg ?? "",
+      dataNasc: initialData?.dataNasc ?? "",
     },
   });
 
@@ -71,11 +74,11 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
         email: initialData?.email ?? "",
         cpf: initialData?.cpf ?? "",
         contato: initialData?.contato ?? "",
-        contatoEmergencia: initialData?.contatoEmergencia ?? "",
-        nascimento: initialData?.nascimento ?? "",
+        contatoEmerg: initialData?.contatoEmerg ?? "",
+        dataNasc: initialData?.dataNasc ?? "",
       });
     }
-  }, [visible]);
+  }, []);
 
   async function onSubmit(data: FormData) {
     if (!userProfile) return;
@@ -85,8 +88,8 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
         email: data.email,
         cpf: data.cpf,
         contato: data.contato,
-        contatoEmerg: data.contatoEmergencia,
-        dataNasc: data.nascimento,
+        contatoEmerg: data.contatoEmerg,
+        dataNasc: data.dataNasc,
       });
       await refreshUserProfile();
       onClose();
@@ -239,7 +242,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                 </Text>
                 <Controller
                   control={control}
-                  name="contatoEmergencia"
+                  name="contatoEmerg"
                   rules={{
                     validate: (v) => {
                       if (!v) return true;
@@ -258,7 +261,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                     />
                   )}
                 />
-                <FieldError message={errors.contatoEmergencia?.message} />
+                <FieldError message={errors.contatoEmerg?.message} />
               </View>
 
               {/* Data de Nascimento */}
@@ -268,7 +271,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                 </Text>
                 <Controller
                   control={control}
-                  name="nascimento"
+                  name="dataNasc"
                   rules={{
                     required: "Data de nascimento é obrigatória",
                     validate: validarData,
@@ -285,7 +288,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                     />
                   )}
                 />
-                <FieldError message={errors.nascimento?.message} />
+                <FieldError message={errors.dataNasc?.message} />
               </View>
 
               <TouchableOpacity
