@@ -1,7 +1,7 @@
 import { auth, db } from "@/src/lib/firebase";
+import { IUsuario } from "@/src/modules/usuario/ts/IUsuario";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { IUsuario } from "../ts/IUsuario";
 
 function traduzirErro(code: string): string {
   const mensagens: Record<string, string> = {

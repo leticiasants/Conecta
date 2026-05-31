@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { logout } from "../modules/auth/services/logout";
 
 const LARGURA_SIDEBAR = Dimensions.get("window").width * 0.78;
 
@@ -103,6 +104,7 @@ export function Sidebar({ visivel, onClose, itens }: Propriedades) {
   }
 
   function aoSair() {
+    logout();
     onClose();
     router.replace("/login");
   }

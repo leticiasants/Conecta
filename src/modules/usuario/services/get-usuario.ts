@@ -1,5 +1,5 @@
 import { db } from "@/src/lib/firebase";
-import { IUsuario } from "@/src/types/IUsuario";
+import { IUsuario } from "@/src/modules/usuario/ts/IUsuario";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 export async function getUsuario(uid: string): Promise<IUsuario | null> {

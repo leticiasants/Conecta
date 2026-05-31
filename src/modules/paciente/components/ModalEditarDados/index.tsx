@@ -1,7 +1,7 @@
 import { FieldError } from "@/src/components/FieldError";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
-import { IUsuario } from "@/src/types/IUsuario";
+import { IUsuario } from "@/src/modules/usuario/ts/IUsuario";
 import { formatCPF, formatContato, formatDate } from "@/src/utils/formatters";
 import {
   EMAIL_PATTERN,
@@ -89,7 +89,9 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
       await refreshUserProfile();
       onClose();
     } catch (err: any) {
-      setError("root", { message: err.message ?? "Não foi possível salvar os dados." });
+      setError("root", {
+        message: err.message ?? "Não foi possível salvar os dados.",
+      });
     }
   }
 
