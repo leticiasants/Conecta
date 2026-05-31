@@ -11,6 +11,7 @@ import { IPaciente } from "../../paciente/ts/IPaciente";
 
 export async function getAllPacientes(
   psicologoId: string,
+  search?: string,
 ): Promise<IPaciente[]> {
   try {
     const fichasSnap = await getDocs(
@@ -72,7 +73,13 @@ export async function getAllPacientes(
       });
     }
 
-    return pacientes;
+    if (!search?.trim()) return pacientes;
+    const termo = search.toLowerCase();
+    return pacientes.filter(
+      (p) =>
+        p.nome?.toLowerCase().includes(termo) ||
+        p.email?.toLowerCase().includes(termo),
+    );
   } catch (error) {
     console.error("Erro ao buscar pacientes:", error);
     return [];

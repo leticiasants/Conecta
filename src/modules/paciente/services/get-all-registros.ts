@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { IRegistro } from "../ts/IRegistro";
 
-export async function getAllRegistros(fichaId: string): Promise<IRegistro[]> {
+export async function getAllRegistros(fichaId: string, search?: string): Promise<IRegistro[]> {
   try {
     const registrosRef = collection(
       db,
@@ -19,7 +19,7 @@ export async function getAllRegistros(fichaId: string): Promise<IRegistro[]> {
 
     const q = query(registrosRef, orderBy("dataCriacao", "desc"));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => {
+    const results = snap.docs.map((d) => {
       const data = d.data();
       return {
         id: d.id,
@@ -37,6 +37,15 @@ export async function getAllRegistros(fichaId: string): Promise<IRegistro[]> {
             : undefined,
       };
     });
+
+    if (!search?.trim()) return results;
+    const termo = search.toLowerCase();
+    return results.filter(
+      (r) =>
+        r.situacao.toLowerCase().includes(termo) ||
+        r.emocao.toLowerCase().includes(termo) ||
+        String(r.intensidade).includes(search),
+    );
   } catch (error) {
     console.error("Erro ao buscar registros:", error);
     return [];

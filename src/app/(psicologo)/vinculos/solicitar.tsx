@@ -6,7 +6,7 @@ import { IPaciente } from "@/src/modules/paciente/ts/IPaciente";
 import { solicitarAlteracaoPsicologo } from "@/src/modules/psicologo/services/create-solicitacao-vinculo";
 import { getAllPacientes } from "@/src/modules/usuario/services/get-all-pacientes";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CardVinculo } from "./components/CardVinculo";
@@ -23,8 +23,8 @@ export default function SolicitarVinculoScreen() {
 
   useEffect(() => {
     if (!userProfile) return;
-    getAllPacientes(userProfile.id).then(setPacientes);
-  }, [userProfile]);
+    getAllPacientes(userProfile.id, search).then(setPacientes);
+  }, [userProfile, search]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -51,22 +51,9 @@ export default function SolicitarVinculoScreen() {
     }
   }
 
-  const filteredPacientes = useMemo(() => {
-    const termo = search.toLowerCase();
+  const totalPages = Math.max(1, Math.ceil(pacientes.length / ITEMS_PER_PAGE));
 
-    return pacientes.filter(
-      (p) =>
-        p.nome?.toLowerCase().includes(termo) ||
-        p.email?.toLowerCase().includes(termo),
-    );
-  }, [pacientes, search]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredPacientes.length / ITEMS_PER_PAGE),
-  );
-
-  const pageData = filteredPacientes.slice(
+  const pageData = pacientes.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );

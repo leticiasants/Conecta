@@ -47,23 +47,16 @@ export default function RelatosScreen() {
       setRelatos([]);
       return;
     }
-    const data = await getAllRegistros(fichaId);
+    const data = await getAllRegistros(fichaId, search);
     setRelatos(data);
-  }, [fichaId]);
+  }, [fichaId, search]);
 
   useEffect(() => {
     carregarRelatos();
   }, [carregarRelatos]);
 
-  const filtered = relatos.filter(
-    (r) =>
-      r.situacao.toLowerCase().includes(search.toLowerCase()) ||
-      r.emocao.toLowerCase().includes(search.toLowerCase()) ||
-      String(r.intensidade).includes(search),
-  );
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  const pageData = filtered.slice(
+  const totalPages = Math.max(1, Math.ceil(relatos.length / ITEMS_PER_PAGE));
+  const pageData = relatos.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );

@@ -13,6 +13,7 @@ import {
 
 export async function getAllSolicitacaoVinculo(
   idPaciente: string,
+  search?: string,
 ): Promise<ISolicitacao[]> {
   try {
     const fichaQuery = query(
@@ -39,7 +40,7 @@ export async function getAllSolicitacaoVinculo(
 
     const alteracaoSnap = await getDocs(alteracaoQuery);
 
-    return await Promise.all(
+    const results = await Promise.all(
       alteracaoSnap.docs.map(async (alteracaoDoc) => {
         const alteracao = alteracaoDoc.data();
 
@@ -61,6 +62,14 @@ export async function getAllSolicitacaoVinculo(
               : alteracao.dataCriacao,
         };
       }),
+    );
+
+    if (!search?.trim()) return results;
+    const termo = search.toLowerCase();
+    return results.filter(
+      (s) =>
+        s.nomePsicologo?.toLowerCase().includes(termo) ||
+        s.crpPsicologo?.toLowerCase().includes(termo),
     );
   } catch (error) {
     console.error("Erro ao listar solicitações:", error);

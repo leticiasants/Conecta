@@ -5,6 +5,7 @@ import { IPacienteComSolicitacao } from "../../paciente/ts/IPaciente";
 
 export async function getAllSolicitacaoVinculo(
   psicologoId: string,
+  search?: string,
 ): Promise<IPacienteComSolicitacao[]> {
   try {
     const fichasRef = collection(db, "fichaAtendimento");
@@ -54,8 +55,17 @@ export async function getAllSolicitacaoVinculo(
       }),
     );
 
-    return pacientes.filter(
+    const resultado = pacientes.filter(
       (paciente): paciente is IPacienteComSolicitacao => paciente !== null,
+    );
+
+    if (!search?.trim()) return resultado;
+    const termo = search.toLowerCase();
+    return resultado.filter(
+      (s) =>
+        s.nome.toLowerCase().includes(termo) ||
+        s.email.toLowerCase().includes(termo) ||
+        s.contato?.includes(search),
     );
   } catch (error) {
     console.error("Erro ao listar pacientes com solicitação:", error);

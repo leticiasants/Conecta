@@ -4,7 +4,7 @@ import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registr
 import { IRegistro } from "@/src/modules/paciente/ts/IRegistro";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
 import { CardRelato } from "../../(paciente)/relatos/components";
 
@@ -27,7 +27,7 @@ export default function RegistrosScreen() {
     try {
       if (!fichaIdStr) return;
 
-      const data = await getAllRegistros(fichaIdStr);
+      const data = await getAllRegistros(fichaIdStr, search);
 
       setRegistros(data);
     } catch {
@@ -37,25 +37,15 @@ export default function RegistrosScreen() {
 
   useEffect(() => {
     carregarRegistros();
-  }, []);
+  }, [fichaIdStr, search]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
 
-  const filtered = useMemo(() => {
-    const termo = search.toLowerCase();
-    return registros.filter(
-      (r) =>
-        r.situacao.toLowerCase().includes(termo) ||
-        r.emocao.toLowerCase().includes(termo) ||
-        String(r.intensidade).includes(search),
-    );
-  }, [registros, search]);
+  const totalPages = Math.max(1, Math.ceil(registros.length / ITEMS_PER_PAGE));
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-
-  const pageData = filtered.slice(
+  const pageData = registros.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );

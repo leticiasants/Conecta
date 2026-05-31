@@ -29,7 +29,7 @@ export default function VinculosPendentesScreen() {
     if (!userProfile) return;
 
     try {
-      const data = await getAllSolicitacaoVinculo(userProfile.id);
+      const data = await getAllSolicitacaoVinculo(userProfile.id, search);
 
       setSolicitacoes(data);
     } catch (error) {
@@ -37,22 +37,15 @@ export default function VinculosPendentesScreen() {
 
       Alert.alert("Erro", "Não foi possível carregar solicitações.");
     }
-  }, [userProfile]);
+  }, [userProfile, search]);
 
   useEffect(() => {
     carregar();
   }, [carregar]);
 
-  const filtered = solicitacoes.filter(
-    (s) =>
-      s.nome.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()) ||
-      s.contato?.includes(search),
-  );
+  const totalPages = Math.max(1, Math.ceil(solicitacoes.length / ITEMS_PER_PAGE));
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-
-  const pageData = filtered.slice(
+  const pageData = solicitacoes.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );

@@ -54,13 +54,13 @@ export default function PacientesScreen() {
     if (!user) return;
 
     try {
-      const data = await getAllPacientesDoPsicologo(userProfile?.id || "");
+      const data = await getAllPacientesDoPsicologo(userProfile?.id || "", search);
 
       setPacientes(data);
     } catch {
       Alert.alert("Erro", "Não foi possível carregar pacientes.");
     }
-  }, [user, userProfile]);
+  }, [user, userProfile, search]);
 
   useEffect(() => {
     carregar();
@@ -71,25 +71,14 @@ export default function PacientesScreen() {
     setCurrentPage(1);
   }, [search]);
 
-  const filtered = useMemo(() => {
-    const termo = search?.toLowerCase() ?? "";
-
-    return pacientes.filter(
-      (p) =>
-        p.nome.toLowerCase().includes(termo) ||
-        p.email.toLowerCase().includes(termo) ||
-        p.contato?.includes(search),
-    );
-  }, [pacientes, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(pacientes.length / ITEMS_PER_PAGE));
 
   const pageData = useMemo(() => {
-    return filtered.slice(
+    return pacientes.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
       currentPage * ITEMS_PER_PAGE,
     );
-  }, [filtered, currentPage]);
+  }, [pacientes, currentPage]);
 
   async function handleDesvincular() {
     if (!confirmFichaId) return;

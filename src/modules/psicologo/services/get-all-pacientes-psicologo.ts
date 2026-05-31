@@ -10,6 +10,7 @@ import { IPaciente } from "../../paciente/ts/IPaciente";
 
 export async function getAllPacientesDoPsicologo(
   psicologoId: string,
+  search?: string,
 ): Promise<IPaciente[]> {
   const fichasQuery = query(
     collection(db, "fichaAtendimento"),
@@ -67,5 +68,12 @@ export async function getAllPacientesDoPsicologo(
     (a, b) => pacientesIds.indexOf(a.id!) - pacientesIds.indexOf(b.id!),
   );
 
-  return pacientes;
+  if (!search?.trim()) return pacientes;
+  const termo = search.toLowerCase();
+  return pacientes.filter(
+    (p) =>
+      p.nome.toLowerCase().includes(termo) ||
+      p.email.toLowerCase().includes(termo) ||
+      p.contato?.includes(search),
+  );
 }
