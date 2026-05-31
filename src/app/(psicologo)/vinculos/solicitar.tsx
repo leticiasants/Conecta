@@ -21,9 +21,15 @@ export default function SolicitarVinculoScreen() {
 
   const [pacientes, setPacientes] = useState<IPaciente[]>([]);
 
-  useEffect(() => {
+  async function carregarPacientes() {
     if (!userProfile) return;
-    getAllPacientes(userProfile.id, search).then(setPacientes);
+
+    const data = await getAllPacientes(userProfile.id, search);
+    setPacientes(data);
+  }
+
+  useEffect(() => {
+    carregarPacientes();
   }, [userProfile, search]);
 
   useEffect(() => {
@@ -43,7 +49,7 @@ export default function SolicitarVinculoScreen() {
 
       Alert.alert("Sucesso", "Solicitação enviada.");
 
-      // rodar getAllPacientes
+      await carregarPacientes();
     } catch (error) {
       console.log(error);
 
