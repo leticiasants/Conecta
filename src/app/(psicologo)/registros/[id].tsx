@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
-import { CardRelato } from "../../(paciente)/relatos/components";
+import { CardRegistro } from "../../(paciente)/registro/components";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -79,7 +79,7 @@ export default function RegistrosScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <CardRelato
+          <CardRegistro
             id={item.id}
             situacao={item.situacao}
             emocao={item.emocao}

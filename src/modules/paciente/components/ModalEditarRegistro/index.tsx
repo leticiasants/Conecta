@@ -47,7 +47,7 @@ const EMPTY: IRegistro = {
   dataOcorrido: "",
 };
 
-export function ModalEditarRelato({
+export function ModalEditarRegistro({
   visible,
   onClose,
   initialData,
@@ -106,7 +106,7 @@ export function ModalEditarRelato({
               </TouchableOpacity>
 
               <Text className="text-4xl font-bold text-primary text-center mb-8">
-                Editar Relato
+                Editar Registro
               </Text>
 
               <Field label="Situação">
@@ -133,10 +133,16 @@ export function ModalEditarRelato({
                 <Text className="text-grey-800 text-sm mb-1">
                   Intensidade da emoção <Text className="text-primary">*</Text>
                 </Text>
+
+                <Text className="text-center text-primary font-bold">
+                  {form.intensidade}
+                </Text>
+
                 <View className="flex-row justify-between mb-1">
                   <Text className="text-xs text-primary font-bold">1</Text>
                   <Text className="text-xs text-primary font-bold">10</Text>
                 </View>
+
                 <Slider
                   minimumValue={1}
                   maximumValue={10}

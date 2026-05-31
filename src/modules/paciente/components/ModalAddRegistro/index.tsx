@@ -148,7 +148,7 @@ export function ModalAddRegistro({
               </TouchableOpacity>
 
               <Text className="text-4xl font-bold text-primary text-center mb-8">
-                {isEditing ? "Editar Relato" : "Adicionar Relato"}
+                {isEditing ? "Editar Registro" : "Adicionar Registro"}
               </Text>
 
               <Field label="Situação">
@@ -172,13 +172,12 @@ export function ModalAddRegistro({
                   Intensidade da emoção <Text className="text-primary">*</Text>
                 </Text>
 
-                <Text className="text-center text-primary font-bold mb-2">
+                <Text className="text-center text-primary font-bold">
                   {form.intensidade}
                 </Text>
 
                 <View className="flex-row justify-between mb-1">
                   <Text className="text-xs text-primary font-bold">1</Text>
-
                   <Text className="text-xs text-primary font-bold">10</Text>
                 </View>
 

@@ -159,7 +159,7 @@ export default function MeusDadosScreen() {
 
       <ConfirmModal
         visible={excluirVisible}
-        message="Tem certeza de que deseja excluir sua conta? Esta ação é permanente e não poderá ser desfeita. Ao continuar, você perderá o acesso a todos os seus relatos e vínculos."
+        message="Tem certeza de que deseja excluir sua conta? Esta ação é permanente e não poderá ser desfeita. Ao continuar, você perderá o acesso a todos os seus registros e vínculos."
         onClose={() => setExcluirVisible(false)}
         onConfirm={handleExcluirConta}
       />

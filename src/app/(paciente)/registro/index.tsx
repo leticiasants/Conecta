@@ -4,7 +4,7 @@ import { ConfirmModal } from "@/src/components/ConfirmModal";
 import { Pagination } from "@/src/components/Pagination";
 import { SearchBar } from "@/src/components/SearchBar";
 import { ModalAddRegistro } from "@/src/modules/paciente/components";
-import { ModalEditarRelato } from "@/src/modules/paciente/components/ModalEditarRelato";
+import { ModalEditarRegistro } from "@/src/modules/paciente/components/ModalEditarRegistro";
 import { createRegistro } from "@/src/modules/paciente/services/create-registro";
 import { deleteRegistro } from "@/src/modules/paciente/services/delete-registro";
 import { getAllRegistros } from "@/src/modules/paciente/services/get-all-registros";
@@ -16,14 +16,14 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CardRelato } from "./components";
+import { CardRegistro } from "./components";
 
 const ITEMS_PER_PAGE = 3;
-type ActionsState = { relatoId: string; position: ActionPosition };
+type ActionsState = { registroId: string; position: ActionPosition };
 
-export default function RelatosScreen() {
+export default function RegistroScreen() {
   const { temPsicologo, fichaId } = usePacientePermissao();
-  const [relatos, setRelatos] = useState<IRegistro[]>([]);
+  const [registros, setRegistros] = useState<IRegistro[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [addVisible, setAddVisible] = useState(false);
@@ -42,21 +42,21 @@ export default function RelatosScreen() {
     }
   }, [openAdd]);
 
-  const carregarRelatos = useCallback(async () => {
+  const carregarRegistros = useCallback(async () => {
     if (!fichaId) {
-      setRelatos([]);
+      setRegistros([]);
       return;
     }
     const data = await getAllRegistros(fichaId, search);
-    setRelatos(data);
+    setRegistros(data);
   }, [fichaId, search]);
 
   useEffect(() => {
-    carregarRelatos();
-  }, [carregarRelatos]);
+    carregarRegistros();
+  }, [carregarRegistros]);
 
-  const totalPages = Math.max(1, Math.ceil(relatos.length / ITEMS_PER_PAGE));
-  const pageData = relatos.slice(
+  const totalPages = Math.max(1, Math.ceil(registros.length / ITEMS_PER_PAGE));
+  const pageData = registros.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
@@ -71,11 +71,11 @@ export default function RelatosScreen() {
 
     try {
       await createRegistro(fichaId, data);
-      await carregarRelatos();
+      await carregarRegistros();
 
-      Alert.alert("Sucesso", "Relato salvo.");
+      Alert.alert("Sucesso", "Registro salvo.");
     } catch {
-      Alert.alert("Erro", "Não foi possível salvar o relato.");
+      Alert.alert("Erro", "Não foi possível salvar o registro.");
     }
   }
 
@@ -83,15 +83,15 @@ export default function RelatosScreen() {
     if (!fichaId || !editData) return;
     try {
       await updateRegistro(fichaId, editData.id, data);
-      setRelatos((prev) =>
+      setRegistros((prev) =>
         prev.map((r) =>
           r.id === editData.id ? { ...data, id: editData.id } : r,
         ),
       );
-      Alert.alert("Sucesso", "Relato atualizado.");
+      Alert.alert("Sucesso", "Registro atualizado.");
       setEditData(null);
     } catch {
-      Alert.alert("Erro", "Não foi possível editar o relato.");
+      Alert.alert("Erro", "Não foi possível editar o registro.");
     }
   }
 
@@ -99,20 +99,20 @@ export default function RelatosScreen() {
     if (!fichaId || !confirmId) return;
     try {
       await deleteRegistro(fichaId, confirmId);
-      setRelatos((prev) => prev.filter((r) => r.id !== confirmId));
-      Alert.alert("Sucesso", "Relato excluído.");
+      setRegistros((prev) => prev.filter((r) => r.id !== confirmId));
+      Alert.alert("Sucesso", "Registro excluído.");
       setConfirmId(null);
     } catch {
-      Alert.alert("Erro", "Não foi possível excluir o relato.");
+      Alert.alert("Erro", "Não foi possível excluir o registro.");
     }
   }
 
-  function openActions(relatoId: string, position: ActionPosition) {
-    setActionsState({ relatoId, position });
+  function openActions(registroId: string, position: ActionPosition) {
+    setActionsState({ registroId, position });
   }
 
-  const selectedRelato = actionsState
-    ? (relatos.find((r) => r.id === actionsState.relatoId) ?? null)
+  const selectedRegistro = actionsState
+    ? (registros.find((r) => r.id === actionsState.registroId) ?? null)
     : null;
 
   return (
@@ -121,7 +121,7 @@ export default function RelatosScreen() {
         <View className="flex-row items-start justify-between mb-1">
           <View>
             <Text className="text-2xl font-bold text-primary">
-              Meus Relatos
+              Meus Registros
             </Text>
             <Text className="text-sm text-grey-500 mt-1 mb-3">
               Registre e acompanhe suas emoções.
@@ -165,7 +165,7 @@ export default function RelatosScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 8 }}
         renderItem={({ item }) => (
-          <CardRelato
+          <CardRegistro
             id={item.id}
             situacao={item.situacao}
             emocao={item.emocao}
@@ -181,7 +181,7 @@ export default function RelatosScreen() {
             <Text className="text-grey-500 text-sm">
               {fichaId === null
                 ? "Você não possui vínculo ativo com um psicólogo."
-                : "Infelizmente nenhum relato encontrado."}
+                : "Infelizmente nenhum registro encontrado."}
             </Text>
           </View>
         }
@@ -202,7 +202,7 @@ export default function RelatosScreen() {
             icon: "edit",
             label: "Editar",
             onPress: () => {
-              if (selectedRelato) setEditData(selectedRelato);
+              if (selectedRegistro) setEditData(selectedRegistro);
             },
           },
           {
@@ -211,7 +211,7 @@ export default function RelatosScreen() {
             iconColor: "#990000",
             labelClass: "text-sm font-semibold text-red",
             onPress: () => {
-              if (actionsState) setConfirmId(actionsState.relatoId);
+              if (actionsState) setConfirmId(actionsState.registroId);
             },
           },
         ]}
@@ -223,7 +223,7 @@ export default function RelatosScreen() {
         onSave={handleAdd}
       />
 
-      <ModalEditarRelato
+      <ModalEditarRegistro
         visible={!!editData}
         initialData={
           editData
@@ -243,7 +243,7 @@ export default function RelatosScreen() {
 
       <ConfirmModal
         visible={!!confirmId}
-        message="Tem certeza de que deseja excluir este relato? Esta ação não pode ser desfeita."
+        message="Tem certeza de que deseja excluir este registro? Esta ação não pode ser desfeita."
         confirmLabel="Excluir"
         onClose={() => setConfirmId(null)}
         onConfirm={handleDelete}

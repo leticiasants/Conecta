@@ -12,7 +12,7 @@ export default function HomePacienteScreen() {
         </Text>
         <Text className="text-center text-grey-800 font-primary">
           Registrar o que você sente ao longo da semana é um passo importante
-          para o seu autoconhecimento. Compartilhar seus relatos com o(a)
+          para o seu autoconhecimento. Compartilhar seus registros com o(a)
           psicólogo(a) também ajuda na construção de um processo terapêutico
           mais eficaz.
         </Text>

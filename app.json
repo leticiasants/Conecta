@@ -4,7 +4,7 @@
     "slug": "conecta",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/logo/logo_img_conecta.png",
+    "icon": "./src/assets/logo/logo.png",
     "scheme": "conecta",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,23 +15,23 @@
       "package": "com.conectaapp.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./src/assets/logo/logo_img_conecta.png",
-        "backgroundImage": "./src/assets/logo/logo_img_conecta.png",
-        "monochromeImage": "./src/assets/logo/logo_img_conecta.png"
+        "foregroundImage": "./src/assets/logo/logo.png",
+        "backgroundImage": "./src/assets/logo/logo.png",
+        "monochromeImage": "./src/assets/logo/logo.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./src/assets/logo/logo_img_conecta.png"
+      "favicon": "./src/assets/logo/logo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/logo/logo_img_conecta.png",
+          "image": "./src/assets/logo/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

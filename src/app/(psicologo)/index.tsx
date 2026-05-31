@@ -12,7 +12,7 @@ export default function HomeScreen() {
         </Text>
         <Text className="text-center text-grey-800 font-primary">
           Aqui você pode acompanhar de perto o progresso dos seus pacientes. Use
-          os relatos para acompanhar melhor seus sentimentos, identificar
+          os registros para acompanhar melhor seus sentimentos, identificar
           padrões e preparar sessões mais eficazes e acolhedoras.
         </Text>
         <Text className="text-grey-500 text-center font-secondary-bold">

@@ -8,7 +8,7 @@ interface Props extends IRegistro {
   acoes?: (position: ActionPosition) => void;
 }
 
-export function CardRelato({
+export function CardRegistro({
   situacao,
   emocao,
   intensidade,
@@ -17,6 +17,9 @@ export function CardRelato({
   acoes,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
+  const [measured, setMeasured] = useState(false);
+
   const buttonRef = useRef<View>(null);
 
   function handleActions() {
@@ -77,23 +80,32 @@ export function CardRelato({
           <View className="flex-1">
             <Text
               className="text-sm text-grey-800 leading-5"
-              numberOfLines={expanded ? undefined : 3}
+              numberOfLines={measured && !expanded ? 3 : undefined}
+              onTextLayout={(e) => {
+                if (!measured) {
+                  setShowReadMore(e.nativeEvent.lines.length > 3);
+                  setMeasured(true);
+                }
+              }}
             >
               {descricao}
             </Text>
-            <TouchableOpacity
-              onPress={() => setExpanded(!expanded)}
-              className="flex-row items-center mt-1 gap-1"
-            >
-              <Text className="text-xs text-primary">
-                {expanded ? "Ler menos" : "Ler mais"}
-              </Text>
-              <MaterialIcons
-                name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-                size={14}
-                color="#5C868E"
-              />
-            </TouchableOpacity>
+
+            {showReadMore && (
+              <TouchableOpacity
+                onPress={() => setExpanded(!expanded)}
+                className="flex-row items-center mt-1 gap-1"
+              >
+                <Text className="text-xs text-primary">
+                  {expanded ? "Ler menos" : "Ler mais"}
+                </Text>
+                <MaterialIcons
+                  name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+                  size={14}
+                  color="#5C868E"
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

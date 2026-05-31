@@ -106,15 +106,15 @@ export default function PacienteLayout() {
             { icone: "home", rotulo: "Home", rota: "/(paciente)" },
             {
               icone: "format-list-bulleted",
-              rotulo: "Relatos",
-              rota: "/(paciente)/relatos",
+              rotulo: "Registros",
+              rota: "/(paciente)/registro",
               subItens: [
-                { rotulo: "Meus Relatos", rota: "/(paciente)/relatos" },
+                { rotulo: "Meus Registros", rota: "/(paciente)/registro" },
                 ...(temPsicologo
                   ? [
                       {
-                        rotulo: "Adicionar Relato",
-                        rota: "/(paciente)/relatos?openAdd=1",
+                        rotulo: "Adicionar Registro",
+                        rota: "/(paciente)/registro?openAdd=1",
                       },
                     ]
                   : []),
