@@ -1,3 +1,4 @@
+import { FieldError } from "@/src/components/FieldError";
 import { EMAIL_PATTERN, validarCRP } from "@/src/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
@@ -24,11 +25,6 @@ type FormData = {
   repetirSenha: string;
 };
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <Text className="text-tertiary text-xs mt-1.5">{message}</Text>;
-}
-
 export default function CadastroScreen() {
   const [showSenha, setShowSenha] = useState(false);
   const [showRepetir, setShowRepetir] = useState(false);
@@ -37,6 +33,7 @@ export default function CadastroScreen() {
     control,
     handleSubmit,
     watch,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
@@ -49,13 +46,17 @@ export default function CadastroScreen() {
   });
 
   async function onSubmit(data: FormData) {
-    await createPsicologo({
-      nome: data.nome,
-      email: data.email,
-      senha: data.senha,
-      crp: data.crp,
-    });
-    router.replace("/");
+    try {
+      await createPsicologo({
+        nome: data.nome,
+        email: data.email,
+        senha: data.senha,
+        crp: data.crp,
+      });
+      router.replace("/");
+    } catch (err: any) {
+      setError("root", { message: err.message });
+    }
   }
 
   return (
@@ -237,6 +238,7 @@ export default function CadastroScreen() {
           </View>
 
           <View className="gap-1 items-center">
+            <FieldError message={errors.root?.message} />
             <TouchableOpacity
               className="bg-secondary w-full rounded-lg py-3 items-center"
               onPress={handleSubmit(onSubmit)}

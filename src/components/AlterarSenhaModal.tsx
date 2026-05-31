@@ -1,9 +1,9 @@
+import { FieldError } from "@/src/components/FieldError";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -60,7 +60,7 @@ function PasswordField({
           />
         </TouchableOpacity>
       </View>
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      <FieldError message={error} />
     </View>
   );
 }
@@ -71,6 +71,7 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
     handleSubmit,
     watch,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: { oldPassword: "", newPassword: "", repeatPassword: "" },
@@ -84,10 +85,9 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
   async function onSubmit(data: FormData) {
     try {
       await updateSenha(data.oldPassword, data.newPassword);
-      Alert.alert("Sucesso", "Senha alterada com sucesso.");
       handleClose();
     } catch (err: any) {
-      Alert.alert("Erro", err.message);
+      setError("root", { message: err.message });
     }
   }
 
@@ -177,6 +177,7 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
                 )}
               />
 
+              <FieldError message={errors.root?.message} />
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
                 onPress={handleSubmit(onSubmit)}

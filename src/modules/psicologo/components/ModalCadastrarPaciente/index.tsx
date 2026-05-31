@@ -1,3 +1,4 @@
+import { FieldError } from "@/src/components/FieldError";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { createPaciente } from "@/src/modules/psicologo/services/create-paciente";
 import { formatCPF, formatDate } from "@/src/utils/formatters";
@@ -11,7 +12,6 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -35,11 +35,6 @@ type FormData = {
   senha: string;
 };
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <Text className="text-red-500 text-xs mt-1">{message}</Text>;
-}
-
 export function ModalCadastrarPaciente({ visible, onClose }: Props) {
   const { userProfile } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +43,7 @@ export function ModalCadastrarPaciente({ visible, onClose }: Props) {
     control,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: { nome: "", email: "", cpf: "", nascimento: "", senha: "" },
@@ -73,7 +69,7 @@ export function ModalCadastrarPaciente({ visible, onClose }: Props) {
       });
       handleClose();
     } catch (err: any) {
-      Alert.alert("Erro", err.message);
+      setError("root", { message: err.message });
     }
   }
 
@@ -244,6 +240,7 @@ export function ModalCadastrarPaciente({ visible, onClose }: Props) {
                 <FieldError message={errors.senha?.message} />
               </View>
 
+              <FieldError message={errors.root?.message} />
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
                 onPress={handleSubmit(onSubmit)}

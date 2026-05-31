@@ -1,3 +1,4 @@
+import { FieldError } from "@/src/components/FieldError";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
 import { IUsuario } from "@/src/types/IUsuario";
@@ -13,7 +14,6 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -42,11 +42,6 @@ type FormData = {
   dataNasc: string;
 };
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <Text className="text-red-500 text-xs mt-1">{message}</Text>;
-}
-
 export function ModalEditarDados({ visible, onClose, initialData }: Props) {
   const { userProfile, refreshUserProfile } = useAuth();
 
@@ -54,6 +49,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
     control,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
@@ -92,8 +88,8 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
       });
       await refreshUserProfile();
       onClose();
-    } catch {
-      Alert.alert("Erro", "Não foi possível salvar os dados.");
+    } catch (err: any) {
+      setError("root", { message: err.message ?? "Não foi possível salvar os dados." });
     }
   }
 
@@ -290,6 +286,7 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                 <FieldError message={errors.dataNasc?.message} />
               </View>
 
+              <FieldError message={errors.root?.message} />
               <TouchableOpacity
                 className="bg-primary rounded-xl py-4 items-center mt-2"
                 onPress={handleSubmit(onSubmit)}

@@ -1,3 +1,4 @@
+import { FieldError } from "@/src/components/FieldError";
 import { EMAIL_PATTERN } from "@/src/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
@@ -15,11 +16,6 @@ import {
 import { login } from "../modules/auth/services/login";
 
 type FormData = { email: string; senha: string };
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <Text className="text-tertiary text-xs mt-1.5 mb-2">{message}</Text>;
-}
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
@@ -137,11 +133,7 @@ export default function LoginScreen() {
             <FieldError message={errors.senha?.message} />
           </View>
 
-          {errors.root && (
-            <Text className="text-red-300 text-sm text-center mb-4">
-              {errors.root.message}
-            </Text>
-          )}
+          <FieldError message={errors.root?.message} />
 
           <View className="gap-1 items-center mt-4">
             <TouchableOpacity
