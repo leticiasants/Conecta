@@ -1,4 +1,6 @@
 import { ConfirmModal } from "@/src/components/ConfirmModal";
+import { Pagination } from "@/src/components/Pagination";
+import { SearchBar } from "@/src/components/SearchBar";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { ModalAceitarVinculo } from "@/src/modules/paciente/components";
 import { getAllSolicitacaoVinculo } from "@/src/modules/paciente/services/get-all-solicitacao-vinculo";
@@ -8,13 +10,18 @@ import { ISolicitacao } from "@/src/types/ISolicitacao";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CardSolicitacao } from "./components/CardSolicitacao";
+
+const ITEMS_PER_PAGE = 4;
 
 export default function SolicitacoesScreen() {
   const { userProfile } = useAuth();
   const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
   const [recusarItem, setRecusarItem] = useState<ISolicitacao | null>(null);
   const [aceitarItem, setAceitarItem] = useState<ISolicitacao | null>(null);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const carregar = useCallback(async () => {
     if (!userProfile) return;
@@ -66,8 +73,26 @@ export default function SolicitacoesScreen() {
     }
   }
 
+  const filtered = solicitacoes.filter(
+    (s) =>
+      s.nomePsicologo?.toLowerCase().includes(search.toLowerCase()) ||
+      s.crpPsicologo?.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+
+  const pageData = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  function handleSearch(text: string) {
+    setSearch(text);
+    setCurrentPage(1);
+  }
+
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <Text className="text-2xl font-bold text-primary mb-1">
           Solicitações de Acesso
@@ -75,10 +100,15 @@ export default function SolicitacoesScreen() {
         <Text className="text-sm text-grey-500 mb-4">
           Gerencie os vínculos com seus profissionais.
         </Text>
+        <SearchBar
+          value={search}
+          onChangeText={handleSearch}
+          placeholder="Buscar por nome ou CRP"
+        />
       </View>
 
       <FlatList
-        data={solicitacoes}
+        data={pageData}
         keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 8 }}
@@ -100,6 +130,12 @@ export default function SolicitacoesScreen() {
         }
       />
 
+      <Pagination
+        total={totalPages}
+        current={currentPage}
+        onPage={setCurrentPage}
+      />
+
       <ConfirmModal
         visible={!!recusarItem}
         message={`Tem certeza de que deseja recusar o vínculo com ${recusarItem?.nomePsicologo ?? "este profissional"}?`}
@@ -114,6 +150,6 @@ export default function SolicitacoesScreen() {
         onIniciarNovaFicha={() => handleAceitar(true)}
         onCompartilharRegistros={handleAceitar}
       />
-    </View>
+    </SafeAreaView>
   );
 }

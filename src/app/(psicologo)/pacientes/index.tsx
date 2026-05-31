@@ -16,6 +16,7 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { IPaciente } from "@/src/modules/paciente/ts/IPaciente";
 import { desvincularPaciente } from "@/src/modules/psicologo/services/desvincular-paciente";
 import { getAllPacientesDoPsicologo } from "@/src/modules/psicologo/services/get-all-pacientes-psicologo";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionPosition, CardPaciente } from "./components";
 
 const ITEMS_PER_PAGE = 4;
@@ -102,7 +103,7 @@ export default function PacientesScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <View className="flex-row items-start justify-between mb-4">
           <View>
@@ -223,6 +224,6 @@ export default function PacientesScreen() {
         onClose={() => setConfirmFichaId(null)}
         onConfirm={handleDesvincular}
       />
-    </View>
+    </SafeAreaView>
   );
 }

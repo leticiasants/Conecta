@@ -8,6 +8,7 @@ import { getAllSolicitacaoVinculo } from "@/src/modules/psicologo/services/get-a
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { CardVinculo } from "./components/CardVinculo";
 
 const ITEMS_PER_PAGE = 4;
@@ -91,7 +92,7 @@ export default function VinculosPendentesScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <View className="px-4 pt-6 pb-3">
         <Text className="mb-1 text-2xl font-bold text-primary">
           Vínculos Pendentes
@@ -152,6 +153,6 @@ export default function VinculosPendentesScreen() {
         onClose={() => setConfirmId(null)}
         onConfirm={handleCancelar}
       />
-    </View>
+    </SafeAreaView>
   );
 }
