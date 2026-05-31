@@ -72,6 +72,8 @@ export default function RelatosScreen() {
     try {
       await createRegistro(fichaId, data);
       await carregarRelatos();
+
+      Alert.alert("Sucesso", "Relato salvo.");
     } catch {
       Alert.alert("Erro", "Não foi possível salvar o relato.");
     }
@@ -86,6 +88,7 @@ export default function RelatosScreen() {
           r.id === editData.id ? { ...data, id: editData.id } : r,
         ),
       );
+      Alert.alert("Sucesso", "Relato atualizado.");
       setEditData(null);
     } catch {
       Alert.alert("Erro", "Não foi possível editar o relato.");
@@ -97,6 +100,7 @@ export default function RelatosScreen() {
     try {
       await deleteRegistro(fichaId, confirmId);
       setRelatos((prev) => prev.filter((r) => r.id !== confirmId));
+      Alert.alert("Sucesso", "Relato excluído.");
       setConfirmId(null);
     } catch {
       Alert.alert("Erro", "Não foi possível excluir o relato.");

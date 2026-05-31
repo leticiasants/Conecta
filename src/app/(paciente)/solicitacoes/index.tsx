@@ -43,6 +43,7 @@ export default function SolicitacoesScreen() {
       );
 
       setSolicitacoes((prev) => prev.filter((s) => s.id !== recusarItem.id));
+      Alert.alert("Sucesso", "Solicitação recusada.");
 
       setRecusarItem(null);
     } catch {
@@ -66,14 +67,17 @@ export default function SolicitacoesScreen() {
       );
 
       setSolicitacoes((prev) => prev.filter((s) => s.id !== aceitarItem.id));
-
+      Alert.alert("Sucesso", "Vínculo aceito.");
       setAceitarItem(null);
     } catch {
       Alert.alert("Erro", "Não foi possível aceitar a solicitação.");
     }
   }
 
-  const totalPages = Math.max(1, Math.ceil(solicitacoes.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(solicitacoes.length / ITEMS_PER_PAGE),
+  );
 
   const pageData = solicitacoes.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,

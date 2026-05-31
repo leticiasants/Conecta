@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -85,6 +86,7 @@ export function AlterarSenhaModal({ visible, onClose }: Props) {
   async function onSubmit(data: FormData) {
     try {
       await updateSenha(data.oldPassword, data.newPassword);
+      Alert.alert("Sucesso", "Senha alterada com sucesso.");
       handleClose();
     } catch (err: any) {
       setError("root", { message: err.message });

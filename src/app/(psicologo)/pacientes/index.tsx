@@ -54,7 +54,10 @@ export default function PacientesScreen() {
     if (!user) return;
 
     try {
-      const data = await getAllPacientesDoPsicologo(userProfile?.id || "", search);
+      const data = await getAllPacientesDoPsicologo(
+        userProfile?.id || "",
+        search,
+      );
 
       setPacientes(data);
     } catch {
@@ -66,7 +69,6 @@ export default function PacientesScreen() {
     carregar();
   }, [carregar]);
 
-  // resetar paginação ao pesquisar
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
@@ -85,6 +87,7 @@ export default function PacientesScreen() {
     try {
       await desvincularPaciente(confirmFichaId);
       setPacientes((prev) => prev.filter((p) => p.idFicha !== confirmFichaId));
+      Alert.alert("Sucesso", "Paciente desvinculado.");
       setConfirmFichaId(null);
     } catch {
       Alert.alert("Erro", "Não foi possível desvincular o paciente.");

@@ -37,10 +37,9 @@ export default function PacienteLayout() {
 
   const recarregarFicha = useCallback(async () => {
     if (!user) return;
-    // createPaciente stores idPaciente as Firestore doc ID (userProfile.id)
-    // aceitar stores idPaciente as Firebase Auth UID (user.uid)
-    // Try both to handle both creation paths
-    let ficha = userProfile?.id ? await getFichaAtendimento(userProfile.id) : null;
+    let ficha = userProfile?.id
+      ? await getFichaAtendimento(userProfile.id)
+      : null;
     if (!ficha) {
       ficha = await getFichaAtendimento(user.uid);
     }

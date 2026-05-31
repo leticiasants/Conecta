@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -67,6 +68,7 @@ export function ModalCadastrarPaciente({ visible, onClose }: Props) {
         psicologoId: userProfile.id,
         dataNasc: data.nascimento || undefined,
       });
+      Alert.alert("Sucesso", "Paciente cadastrado.");
       handleClose();
     } catch (err: any) {
       setError("root", { message: err.message });
