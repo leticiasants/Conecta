@@ -2,13 +2,8 @@ import { FieldError } from "@/src/components/FieldError";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
 import { IUsuario } from "@/src/modules/usuario/ts/IUsuario";
-import { formatCPF, formatContato, formatDate } from "@/src/utils/formatters";
-import {
-  EMAIL_PATTERN,
-  validarCPF,
-  validarData,
-  validarTelefone,
-} from "@/src/utils/validations";
+import { formatContato, formatDate } from "@/src/utils/formatters";
+import { validarData, validarTelefone } from "@/src/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -148,61 +143,6 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                   )}
                 />
                 <FieldError message={errors.nome?.message} />
-              </View>
-
-              {/* E-mail */}
-              <View className="mb-5">
-                <Text className="text-grey-800 text-sm mb-1">
-                  E-mail <Text className="text-primary">*</Text>
-                </Text>
-                <Controller
-                  control={control}
-                  name="email"
-                  rules={{
-                    required: "E-mail é obrigatório",
-                    pattern: EMAIL_PATTERN,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                      placeholder="joao@email.com"
-                      placeholderTextColor="#aaa"
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                    />
-                  )}
-                />
-                <FieldError message={errors.email?.message} />
-              </View>
-
-              {/* CPF */}
-              <View className="mb-5">
-                <Text className="text-grey-800 text-sm mb-1">
-                  CPF <Text className="text-primary">*</Text>
-                </Text>
-                <Controller
-                  control={control}
-                  name="cpf"
-                  rules={{
-                    required: "CPF é obrigatório",
-                    validate: validarCPF,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                      placeholder="XXX.XXX.XXX-XX"
-                      placeholderTextColor="#aaa"
-                      value={value}
-                      onChangeText={(v) => onChange(formatCPF(v))}
-                      onBlur={onBlur}
-                      keyboardType="numeric"
-                    />
-                  )}
-                />
-                <FieldError message={errors.cpf?.message} />
               </View>
 
               {/* Contato */}

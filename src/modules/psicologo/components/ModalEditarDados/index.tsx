@@ -1,12 +1,8 @@
 import { FieldError } from "@/src/components/FieldError";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { updateUsuario } from "@/src/modules/usuario/services/update-usuario";
-import { formatContato, formatCRP } from "@/src/utils/formatters";
-import {
-  EMAIL_PATTERN,
-  validarCRP,
-  validarTelefone,
-} from "@/src/utils/validations";
+import { formatContato } from "@/src/utils/formatters";
+import { validarTelefone } from "@/src/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -72,7 +68,9 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
       await refreshUserProfile();
       onClose();
     } catch (err: any) {
-      setError("root", { message: err.message ?? "Não foi possível salvar os dados." });
+      setError("root", {
+        message: err.message ?? "Não foi possível salvar os dados.",
+      });
     }
   }
 
@@ -129,60 +127,6 @@ export function ModalEditarDados({ visible, onClose, initialData }: Props) {
                   )}
                 />
                 <FieldError message={errors.nome?.message} />
-              </View>
-
-              {/* E-mail */}
-              <View className="mb-5">
-                <Text className="text-grey-800 text-sm mb-1">
-                  E-mail <Text className="text-primary">*</Text>
-                </Text>
-                <Controller
-                  control={control}
-                  name="email"
-                  rules={{
-                    required: "E-mail é obrigatório",
-                    pattern: EMAIL_PATTERN,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                      placeholder="joao@email.com"
-                      placeholderTextColor="#aaa"
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                    />
-                  )}
-                />
-                <FieldError message={errors.email?.message} />
-              </View>
-
-              {/* CRP */}
-              <View className="mb-5">
-                <Text className="text-grey-800 text-sm mb-1">
-                  CRP <Text className="text-primary">*</Text>
-                </Text>
-                <Controller
-                  control={control}
-                  name="crp"
-                  rules={{
-                    required: "CRP é obrigatório",
-                    validate: validarCRP,
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      className="bg-gray-100 rounded-xl px-4 py-4 text-sm text-grey-800"
-                      placeholder="01/12345"
-                      placeholderTextColor="#aaa"
-                      value={value}
-                      onChangeText={(text) => onChange(formatCRP(text))}
-                      onBlur={onBlur}
-                    />
-                  )}
-                />
-                <FieldError message={errors.crp?.message} />
               </View>
 
               {/* Contato */}
